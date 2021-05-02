@@ -34,7 +34,7 @@ public class Sprint extends Module
     
     @SubscribeEvent
     public void onSprint(final MoveEvent event) {
-        if (event.getStage() == 1 && this.mode.getValue() == Mode.RAGE && (Sprint.mc.field_71439_g.field_71158_b.field_192832_b != 0.0f || Sprint.mc.field_71439_g.field_71158_b.field_78902_a != 0.0f)) {
+        if (event.getStage() == 1 && this.mode.getValue() == Mode.RAGE && (Sprint.mc.player.movementInput.moveForward != 0.0f || Sprint.mc.player.movementInput.moveStrafe != 0.0f)) {
             event.setCanceled(true);
         }
     }
@@ -43,15 +43,15 @@ public class Sprint extends Module
     public void onUpdate() {
         switch (this.mode.getValue()) {
             case RAGE: {
-                if ((Sprint.mc.field_71474_y.field_74351_w.func_151470_d() || Sprint.mc.field_71474_y.field_74368_y.func_151470_d() || Sprint.mc.field_71474_y.field_74370_x.func_151470_d() || Sprint.mc.field_71474_y.field_74366_z.func_151470_d()) && !Sprint.mc.field_71439_g.func_70093_af() && !Sprint.mc.field_71439_g.field_70123_F && Sprint.mc.field_71439_g.func_71024_bL().func_75116_a() > 6.0f) {
-                    Sprint.mc.field_71439_g.func_70031_b(true);
+                if ((Sprint.mc.gameSettings.keyBindForward.isKeyDown() || Sprint.mc.gameSettings.keyBindBack.isKeyDown() || Sprint.mc.gameSettings.keyBindLeft.isKeyDown() || Sprint.mc.gameSettings.keyBindRight.isKeyDown()) && !Sprint.mc.player.isSneaking() && !Sprint.mc.player.collidedHorizontally && Sprint.mc.player.getFoodStats().getFoodLevel() > 6.0f) {
+                    Sprint.mc.player.setSprinting(true);
                     break;
                 }
                 break;
             }
             case LEGIT: {
-                if (Sprint.mc.field_71474_y.field_74351_w.func_151470_d() && !Sprint.mc.field_71439_g.func_70093_af() && !Sprint.mc.field_71439_g.func_184587_cr() && !Sprint.mc.field_71439_g.field_70123_F && Sprint.mc.field_71439_g.func_71024_bL().func_75116_a() > 6.0f && Sprint.mc.field_71462_r == null) {
-                    Sprint.mc.field_71439_g.func_70031_b(true);
+                if (Sprint.mc.gameSettings.keyBindForward.isKeyDown() && !Sprint.mc.player.isSneaking() && !Sprint.mc.player.isHandActive() && !Sprint.mc.player.collidedHorizontally && Sprint.mc.player.getFoodStats().getFoodLevel() > 6.0f && Sprint.mc.currentScreen == null) {
+                    Sprint.mc.player.setSprinting(true);
                     break;
                 }
                 break;
@@ -62,7 +62,7 @@ public class Sprint extends Module
     @Override
     public void onDisable() {
         if (!Feature.nullCheck()) {
-            Sprint.mc.field_71439_g.func_70031_b(false);
+            Sprint.mc.player.setSprinting(false);
         }
     }
     

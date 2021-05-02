@@ -98,7 +98,7 @@ public class Spammer extends Module
             if (this.greentext.getValue()) {
                 messageOut = "> " + messageOut;
             }
-            Spammer.mc.field_71439_g.field_71174_a.func_147297_a((Packet)new CPacketChatMessage(messageOut.replaceAll("§", "")));
+            Spammer.mc.player.connection.sendPacket((Packet)new CPacketChatMessage(messageOut.replaceAll("§", "")));
         }
         this.timer.reset();
     }

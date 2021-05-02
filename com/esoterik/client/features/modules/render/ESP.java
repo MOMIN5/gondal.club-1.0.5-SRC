@@ -75,26 +75,26 @@ public class ESP extends Module
     public void onRender3D(final Render3DEvent event) {
         if (this.items.getValue()) {
             int i = 0;
-            for (final Entity entity : ESP.mc.field_71441_e.field_72996_f) {
-                if (entity instanceof EntityItem && ESP.mc.field_71439_g.func_70068_e(entity) < 2500.0) {
-                    final Vec3d interp = EntityUtil.getInterpolatedRenderPos(entity, ESP.mc.func_184121_ak());
-                    final AxisAlignedBB bb = new AxisAlignedBB(entity.func_174813_aQ().field_72340_a - 0.05 - entity.field_70165_t + interp.field_72450_a, entity.func_174813_aQ().field_72338_b - 0.0 - entity.field_70163_u + interp.field_72448_b, entity.func_174813_aQ().field_72339_c - 0.05 - entity.field_70161_v + interp.field_72449_c, entity.func_174813_aQ().field_72336_d + 0.05 - entity.field_70165_t + interp.field_72450_a, entity.func_174813_aQ().field_72337_e + 0.1 - entity.field_70163_u + interp.field_72448_b, entity.func_174813_aQ().field_72334_f + 0.05 - entity.field_70161_v + interp.field_72449_c);
-                    GlStateManager.func_179094_E();
-                    GlStateManager.func_179147_l();
-                    GlStateManager.func_179097_i();
-                    GlStateManager.func_179120_a(770, 771, 0, 1);
-                    GlStateManager.func_179090_x();
-                    GlStateManager.func_179132_a(false);
+            for (final Entity entity : ESP.mc.world.loadedEntityList) {
+                if (entity instanceof EntityItem && ESP.mc.player.getDistanceSq(entity) < 2500.0) {
+                    final Vec3d interp = EntityUtil.getInterpolatedRenderPos(entity, ESP.mc.getRenderPartialTicks());
+                    final AxisAlignedBB bb = new AxisAlignedBB(entity.getEntityBoundingBox().minX - 0.05 - entity.posX + interp.x, entity.getEntityBoundingBox().minY - 0.0 - entity.posY + interp.y, entity.getEntityBoundingBox().minZ - 0.05 - entity.posZ + interp.z, entity.getEntityBoundingBox().maxX + 0.05 - entity.posX + interp.x, entity.getEntityBoundingBox().maxY + 0.1 - entity.posY + interp.y, entity.getEntityBoundingBox().maxZ + 0.05 - entity.posZ + interp.z);
+                    GlStateManager.pushMatrix();
+                    GlStateManager.enableBlend();
+                    GlStateManager.disableDepth();
+                    GlStateManager.tryBlendFuncSeparate(770, 771, 0, 1);
+                    GlStateManager.disableTexture2D();
+                    GlStateManager.depthMask(false);
                     GL11.glEnable(2848);
                     GL11.glHint(3154, 4354);
                     GL11.glLineWidth(1.0f);
-                    RenderGlobal.func_189696_b(bb, this.red.getValue() / 255.0f, this.green.getValue() / 255.0f, this.blue.getValue() / 255.0f, this.boxAlpha.getValue() / 255.0f);
+                    RenderGlobal.renderFilledBox(bb, this.red.getValue() / 255.0f, this.green.getValue() / 255.0f, this.blue.getValue() / 255.0f, this.boxAlpha.getValue() / 255.0f);
                     GL11.glDisable(2848);
-                    GlStateManager.func_179132_a(true);
-                    GlStateManager.func_179126_j();
-                    GlStateManager.func_179098_w();
-                    GlStateManager.func_179084_k();
-                    GlStateManager.func_179121_F();
+                    GlStateManager.depthMask(true);
+                    GlStateManager.enableDepth();
+                    GlStateManager.enableTexture2D();
+                    GlStateManager.disableBlend();
+                    GlStateManager.popMatrix();
                     RenderUtil.drawBlockOutline(bb, new Color(this.red.getValue(), this.green.getValue(), this.blue.getValue(), this.alpha.getValue()), 1.0f);
                     if (++i >= 50) {
                         break;
@@ -106,28 +106,28 @@ public class ESP extends Module
     }
     
     public void onRenderModel(final RenderEntityModelEvent event) {
-        if (event.getStage() != 0 || event.entity == null || (event.entity.func_82150_aj() && !this.invisibles.getValue()) || (!this.self.getValue() && event.entity.equals((Object)ESP.mc.field_71439_g)) || (!this.players.getValue() && event.entity instanceof EntityPlayer) || (!this.animals.getValue() && EntityUtil.isPassive(event.entity)) || (!this.mobs.getValue() && !EntityUtil.isPassive(event.entity) && !(event.entity instanceof EntityPlayer))) {
+        if (event.getStage() != 0 || event.entity == null || (event.entity.isInvisible() && !this.invisibles.getValue()) || (!this.self.getValue() && event.entity.equals((Object)ESP.mc.player)) || (!this.players.getValue() && event.entity instanceof EntityPlayer) || (!this.animals.getValue() && EntityUtil.isPassive(event.entity)) || (!this.mobs.getValue() && !EntityUtil.isPassive(event.entity) && !(event.entity instanceof EntityPlayer))) {
             return;
         }
         final Color color = EntityUtil.getColor(event.entity, this.red.getValue(), this.green.getValue(), this.blue.getValue(), this.alpha.getValue(), this.colorFriends.getValue());
-        final boolean fancyGraphics = ESP.mc.field_71474_y.field_74347_j;
-        ESP.mc.field_71474_y.field_74347_j = false;
-        final float gamma = ESP.mc.field_71474_y.field_74333_Y;
-        ESP.mc.field_71474_y.field_74333_Y = 10000.0f;
+        final boolean fancyGraphics = ESP.mc.gameSettings.fancyGraphics;
+        ESP.mc.gameSettings.fancyGraphics = false;
+        final float gamma = ESP.mc.gameSettings.gammaSetting;
+        ESP.mc.gameSettings.gammaSetting = 10000.0f;
         if (this.onTop.getValue()) {
-            event.modelBase.func_78088_a(event.entity, event.limbSwing, event.limbSwingAmount, event.age, event.headYaw, event.headPitch, event.scale);
+            event.modelBase.render(event.entity, event.limbSwing, event.limbSwingAmount, event.age, event.headYaw, event.headPitch, event.scale);
         }
         if (this.mode.getValue() == Mode.OUTLINE) {
             RenderUtil.renderOne(this.lineWidth.getValue());
-            event.modelBase.func_78088_a(event.entity, event.limbSwing, event.limbSwingAmount, event.age, event.headYaw, event.headPitch, event.scale);
-            GlStateManager.func_187441_d((float)this.lineWidth.getValue());
+            event.modelBase.render(event.entity, event.limbSwing, event.limbSwingAmount, event.age, event.headYaw, event.headPitch, event.scale);
+            GlStateManager.glLineWidth((float)this.lineWidth.getValue());
             RenderUtil.renderTwo();
-            event.modelBase.func_78088_a(event.entity, event.limbSwing, event.limbSwingAmount, event.age, event.headYaw, event.headPitch, event.scale);
-            GlStateManager.func_187441_d((float)this.lineWidth.getValue());
+            event.modelBase.render(event.entity, event.limbSwing, event.limbSwingAmount, event.age, event.headYaw, event.headPitch, event.scale);
+            GlStateManager.glLineWidth((float)this.lineWidth.getValue());
             RenderUtil.renderThree();
             RenderUtil.renderFour(color);
-            event.modelBase.func_78088_a(event.entity, event.limbSwing, event.limbSwingAmount, event.age, event.headYaw, event.headPitch, event.scale);
-            GlStateManager.func_187441_d((float)this.lineWidth.getValue());
+            event.modelBase.render(event.entity, event.limbSwing, event.limbSwingAmount, event.age, event.headYaw, event.headPitch, event.scale);
+            GlStateManager.glLineWidth((float)this.lineWidth.getValue());
             RenderUtil.renderFive();
         }
         else {
@@ -144,19 +144,19 @@ public class ESP extends Module
             GL11.glDisable(2929);
             GL11.glEnable(2848);
             GL11.glEnable(3042);
-            GlStateManager.func_179112_b(770, 771);
-            GlStateManager.func_179131_c((float)color.getRed(), (float)color.getGreen(), (float)color.getBlue(), (float)color.getAlpha());
-            GlStateManager.func_187441_d((float)this.lineWidth.getValue());
-            event.modelBase.func_78088_a(event.entity, event.limbSwing, event.limbSwingAmount, event.age, event.headYaw, event.headPitch, event.scale);
+            GlStateManager.blendFunc(770, 771);
+            GlStateManager.color((float)color.getRed(), (float)color.getGreen(), (float)color.getBlue(), (float)color.getAlpha());
+            GlStateManager.glLineWidth((float)this.lineWidth.getValue());
+            event.modelBase.render(event.entity, event.limbSwing, event.limbSwingAmount, event.age, event.headYaw, event.headPitch, event.scale);
             GL11.glPopAttrib();
             GL11.glPopMatrix();
         }
         if (!this.onTop.getValue()) {
-            event.modelBase.func_78088_a(event.entity, event.limbSwing, event.limbSwingAmount, event.age, event.headYaw, event.headPitch, event.scale);
+            event.modelBase.render(event.entity, event.limbSwing, event.limbSwingAmount, event.age, event.headYaw, event.headPitch, event.scale);
         }
         try {
-            ESP.mc.field_71474_y.field_74347_j = fancyGraphics;
-            ESP.mc.field_71474_y.field_74333_Y = gamma;
+            ESP.mc.gameSettings.fancyGraphics = fancyGraphics;
+            ESP.mc.gameSettings.gammaSetting = gamma;
         }
         catch (Exception ex) {}
         event.setCanceled(true);

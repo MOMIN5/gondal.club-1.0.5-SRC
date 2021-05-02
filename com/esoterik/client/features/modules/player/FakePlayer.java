@@ -83,7 +83,7 @@ public class FakePlayer extends Module
             return;
         }
         for (final int id : this.fakePlayerIdList) {
-            FakePlayer.mc.field_71441_e.func_73028_b(id);
+            FakePlayer.mc.world.removeEntityFromWorld(id);
         }
     }
     
@@ -96,19 +96,19 @@ public class FakePlayer extends Module
     
     private void addFakePlayer(final String uuid, final String name, final int entityId, final int offsetX, final int offsetZ) {
         final GameProfile profile = new GameProfile(UUID.fromString(uuid), name);
-        final EntityOtherPlayerMP fakePlayer = new EntityOtherPlayerMP((World)FakePlayer.mc.field_71441_e, profile);
-        fakePlayer.func_82149_j((Entity)FakePlayer.mc.field_71439_g);
-        fakePlayer.field_70165_t += offsetX;
-        fakePlayer.field_70161_v += offsetZ;
+        final EntityOtherPlayerMP fakePlayer = new EntityOtherPlayerMP((World)FakePlayer.mc.world, profile);
+        fakePlayer.copyLocationAndAnglesFrom((Entity)FakePlayer.mc.player);
+        fakePlayer.posX += offsetX;
+        fakePlayer.posZ += offsetZ;
         if (this.copyInv.getValue()) {
             for (final PotionEffect potionEffect : esohack.potionManager.getOwnPotions()) {
-                fakePlayer.func_70690_d(potionEffect);
+                fakePlayer.addPotionEffect(potionEffect);
             }
-            fakePlayer.field_71071_by.func_70455_b(FakePlayer.mc.field_71439_g.field_71071_by);
+            fakePlayer.inventory.copyInventory(FakePlayer.mc.player.inventory);
         }
-        fakePlayer.func_70606_j(FakePlayer.mc.field_71439_g.func_110143_aJ() + FakePlayer.mc.field_71439_g.func_110139_bj());
+        fakePlayer.setHealth(FakePlayer.mc.player.getHealth() + FakePlayer.mc.player.getAbsorptionAmount());
         this.fakeEntities.add(fakePlayer);
-        FakePlayer.mc.field_71441_e.func_73027_a(entityId, (Entity)fakePlayer);
+        FakePlayer.mc.world.addEntityToWorld(entityId, (Entity)fakePlayer);
         this.fakePlayerIdList.add(entityId);
     }
     

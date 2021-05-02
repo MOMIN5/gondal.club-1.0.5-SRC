@@ -21,12 +21,12 @@ public class Step extends Module
         if (fullNullCheck()) {
             return;
         }
-        Step.mc.field_71439_g.field_70138_W = 2.0f;
+        Step.mc.player.stepHeight = 2.0f;
     }
     
     @Override
     public void onDisable() {
         super.onDisable();
-        Step.mc.field_71439_g.field_70138_W = 0.6f;
+        Step.mc.player.stepHeight = 0.6f;
     }
 }

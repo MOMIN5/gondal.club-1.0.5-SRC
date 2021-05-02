@@ -32,7 +32,7 @@ public class ReloadManager extends Feature
     public void onPacketSend(final PacketEvent.Send event) {
         if (event.getPacket() instanceof CPacketChatMessage) {
             final CPacketChatMessage packet = event.getPacket();
-            if (packet.func_149439_c().startsWith(this.prefix) && packet.func_149439_c().contains("reload")) {
+            if (packet.getMessage().startsWith(this.prefix) && packet.getMessage().contains("reload")) {
                 esohack.load();
                 event.setCanceled(true);
             }

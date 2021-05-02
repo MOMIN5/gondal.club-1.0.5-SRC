@@ -18,11 +18,11 @@ import org.spongepowered.asm.mixin.Mixin;
 public class MixinKeyBinding
 {
     @Shadow
-    private boolean field_74513_e;
+    private boolean pressed;
     
     @Inject(method = { "isKeyDown" }, at = { @At("RETURN") }, cancellable = true)
     private void isKeyDown(final CallbackInfoReturnable<Boolean> info) {
-        final KeyEvent event = new KeyEvent(0, info.getReturnValue(), this.field_74513_e);
+        final KeyEvent event = new KeyEvent(0, info.getReturnValue(), this.pressed);
         MinecraftForge.EVENT_BUS.post((Event)event);
         info.setReturnValue(event.info);
     }

@@ -28,17 +28,17 @@ public class MixinRenderEnderCrystal
 {
     @Shadow
     @Final
-    private static ResourceLocation field_110787_a;
+    private static ResourceLocation ENDER_CRYSTAL_TEXTURES;
     private static ResourceLocation glint;
     
     @Redirect(method = { "doRender" }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/model/ModelBase;render(Lnet/minecraft/entity/Entity;FFFFFF)V"))
     public void renderModelBaseHook(final ModelBase model, final Entity entity, final float limbSwing, final float limbSwingAmount, final float ageInTicks, final float netHeadYaw, final float headPitch, final float scale) {
         if (CrystalChams.INSTANCE.isEnabled()) {
             if (CrystalChams.INSTANCE.scaleMap.containsKey(entity)) {
-                GlStateManager.func_179152_a((float)CrystalChams.INSTANCE.scaleMap.get(entity), (float)CrystalChams.INSTANCE.scaleMap.get(entity), (float)CrystalChams.INSTANCE.scaleMap.get(entity));
+                GlStateManager.scale((float)CrystalChams.INSTANCE.scaleMap.get(entity), (float)CrystalChams.INSTANCE.scaleMap.get(entity), (float)CrystalChams.INSTANCE.scaleMap.get(entity));
             }
             else {
-                GlStateManager.func_179152_a((float)CrystalChams.INSTANCE.scale.getValue(), (float)CrystalChams.INSTANCE.scale.getValue(), (float)CrystalChams.INSTANCE.scale.getValue());
+                GlStateManager.scale((float)CrystalChams.INSTANCE.scale.getValue(), (float)CrystalChams.INSTANCE.scale.getValue(), (float)CrystalChams.INSTANCE.scale.getValue());
             }
             if (CrystalChams.INSTANCE.wireframe.getValue()) {
                 final RenderEntityModelEvent event = new RenderEntityModelEvent(0, model, entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
@@ -63,7 +63,7 @@ public class MixinRenderEnderCrystal
                 }
                 GL11.glEnable(10754);
                 GL11.glColor4f(rainbowColor2.getRed() / 255.0f, rainbowColor2.getGreen() / 255.0f, rainbowColor2.getBlue() / 255.0f, CrystalChams.INSTANCE.alpha.getValue() / 255.0f);
-                model.func_78088_a(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+                model.render(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
                 if (CrystalChams.INSTANCE.throughWalls.getValue()) {
                     GL11.glEnable(2929);
                     GL11.glDepthMask(true);
@@ -79,13 +79,13 @@ public class MixinRenderEnderCrystal
                 }
                 GL11.glEnable(10754);
                 GL11.glColor4f(hiddenColor.getRed() / 255.0f, hiddenColor.getGreen() / 255.0f, hiddenColor.getBlue() / 255.0f, CrystalChams.INSTANCE.alpha.getValue() / 255.0f);
-                model.func_78088_a(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+                model.render(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
                 if (CrystalChams.INSTANCE.throughWalls.getValue()) {
                     GL11.glEnable(2929);
                     GL11.glDepthMask(true);
                 }
                 GL11.glColor4f(visibleColor.getRed() / 255.0f, visibleColor.getGreen() / 255.0f, visibleColor.getBlue() / 255.0f, CrystalChams.INSTANCE.alpha.getValue() / 255.0f);
-                model.func_78088_a(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+                model.render(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
             }
             else {
                 final Color color2;
@@ -96,7 +96,7 @@ public class MixinRenderEnderCrystal
                 }
                 GL11.glEnable(10754);
                 GL11.glColor4f(visibleColor.getRed() / 255.0f, visibleColor.getGreen() / 255.0f, visibleColor.getBlue() / 255.0f, CrystalChams.INSTANCE.alpha.getValue() / 255.0f);
-                model.func_78088_a(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+                model.render(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
                 if (CrystalChams.INSTANCE.throughWalls.getValue()) {
                     GL11.glEnable(2929);
                     GL11.glDepthMask(true);
@@ -109,13 +109,13 @@ public class MixinRenderEnderCrystal
             GL11.glPopAttrib();
         }
         else {
-            model.func_78088_a(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+            model.render(entity, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
         }
         if (CrystalChams.INSTANCE.scaleMap.containsKey(entity)) {
-            GlStateManager.func_179152_a(1.0f / CrystalChams.INSTANCE.scaleMap.get(entity), 1.0f / CrystalChams.INSTANCE.scaleMap.get(entity), 1.0f / CrystalChams.INSTANCE.scaleMap.get(entity));
+            GlStateManager.scale(1.0f / CrystalChams.INSTANCE.scaleMap.get(entity), 1.0f / CrystalChams.INSTANCE.scaleMap.get(entity), 1.0f / CrystalChams.INSTANCE.scaleMap.get(entity));
         }
         else {
-            GlStateManager.func_179152_a(1.0f / CrystalChams.INSTANCE.scale.getValue(), 1.0f / CrystalChams.INSTANCE.scale.getValue(), 1.0f / CrystalChams.INSTANCE.scale.getValue());
+            GlStateManager.scale(1.0f / CrystalChams.INSTANCE.scale.getValue(), 1.0f / CrystalChams.INSTANCE.scale.getValue(), 1.0f / CrystalChams.INSTANCE.scale.getValue());
         }
     }
 }

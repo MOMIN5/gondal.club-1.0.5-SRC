@@ -39,7 +39,7 @@ public class BreakESP extends Module
     
     @Override
     public void onTick() {
-        if (this.currentPos != null && (!BreakESP.mc.field_71441_e.func_180495_p(this.currentPos).equals(this.currentBlockState) || BreakESP.mc.field_71441_e.func_180495_p(this.currentPos).func_177230_c() == Blocks.field_150350_a)) {
+        if (this.currentPos != null && (!BreakESP.mc.world.getBlockState(this.currentPos).equals(this.currentBlockState) || BreakESP.mc.world.getBlockState(this.currentPos).getBlock() == Blocks.AIR)) {
             this.currentPos = null;
             this.currentBlockState = null;
         }

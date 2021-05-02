@@ -19,18 +19,18 @@ public abstract class MixinRenderGlobal
     @Redirect(method = { "setupTerrain" }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/ChunkRenderContainer;initialize(DDD)V"))
     public void initializeHook(final ChunkRenderContainer chunkRenderContainer, final double viewEntityXIn, final double viewEntityYIn, final double viewEntityZIn) {
         final double y = viewEntityYIn;
-        chunkRenderContainer.func_178004_a(viewEntityXIn, y, viewEntityZIn);
+        chunkRenderContainer.initialize(viewEntityXIn, y, viewEntityZIn);
     }
     
     @Redirect(method = { "renderEntities" }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/renderer/entity/RenderManager;setRenderPosition(DDD)V"))
     public void setRenderPositionHook(final RenderManager renderManager, final double renderPosXIn, final double renderPosYIn, final double renderPosZIn) {
         final double y = renderPosYIn;
-        renderManager.func_178628_a(renderPosXIn, TileEntityRendererDispatcher.field_147555_c = y, renderPosZIn);
+        renderManager.setRenderPosition(renderPosXIn, TileEntityRendererDispatcher.staticPlayerY = y, renderPosZIn);
     }
     
     @Redirect(method = { "drawSelectionBox" }, at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/AxisAlignedBB;offset(DDD)Lnet/minecraft/util/math/AxisAlignedBB;"))
     public AxisAlignedBB offsetHook(final AxisAlignedBB axisAlignedBB, final double x, final double y, final double z) {
         final double yIn = y;
-        return axisAlignedBB.func_72317_d(x, y, z);
+        return axisAlignedBB.offset(x, y, z);
     }
 }

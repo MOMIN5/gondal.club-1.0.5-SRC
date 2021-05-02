@@ -30,12 +30,12 @@ public class DonkeyNotifier extends Module
     
     @Override
     public void onUpdate() {
-        for (final Entity entity : DonkeyNotifier.mc.field_71441_e.field_72996_f) {
+        for (final Entity entity : DonkeyNotifier.mc.world.loadedEntityList) {
             if (entity instanceof EntityDonkey) {
                 if (this.entities.contains(entity)) {
                     continue;
                 }
-                Command.sendMessage("Donkey Detected at: " + entity.field_70165_t + "x, " + entity.field_70163_u + "y, " + entity.field_70161_v + "z.");
+                Command.sendMessage("Donkey Detected at: " + entity.posX + "x, " + entity.posY + "y, " + entity.posZ + "z.");
                 this.entities.add(entity);
             }
         }

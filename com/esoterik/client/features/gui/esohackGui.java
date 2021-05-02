@@ -79,21 +79,21 @@ public class esohackGui extends GuiScreen
         }
     }
     
-    public void func_73863_a(final int mouseX, final int mouseY, final float partialTicks) {
+    public void drawScreen(final int mouseX, final int mouseY, final float partialTicks) {
         this.checkMouseWheel();
-        this.func_146276_q_();
+        this.drawDefaultBackground();
         this.components.forEach(components -> components.drawScreen(mouseX, mouseY, partialTicks));
     }
     
-    public void func_73864_a(final int mouseX, final int mouseY, final int clickedButton) {
+    public void mouseClicked(final int mouseX, final int mouseY, final int clickedButton) {
         this.components.forEach(components -> components.mouseClicked(mouseX, mouseY, clickedButton));
     }
     
-    public void func_146286_b(final int mouseX, final int mouseY, final int releaseButton) {
+    public void mouseReleased(final int mouseX, final int mouseY, final int releaseButton) {
         this.components.forEach(components -> components.mouseReleased(mouseX, mouseY, releaseButton));
     }
     
-    public boolean func_73868_f() {
+    public boolean doesGuiPauseGame() {
         return false;
     }
     
@@ -124,8 +124,8 @@ public class esohackGui extends GuiScreen
         return null;
     }
     
-    public void func_73869_a(final char typedChar, final int keyCode) throws IOException {
-        super.func_73869_a(typedChar, keyCode);
+    public void keyTyped(final char typedChar, final int keyCode) throws IOException {
+        super.keyTyped(typedChar, keyCode);
         this.components.forEach(component -> component.onKeyTyped(typedChar, keyCode));
     }
     

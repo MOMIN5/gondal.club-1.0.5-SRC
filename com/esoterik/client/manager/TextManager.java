@@ -49,14 +49,14 @@ public class TextManager extends Feature
             }
             return;
         }
-        TextManager.mc.field_71466_p.func_175065_a(text, x, y, color, shadow);
+        TextManager.mc.fontRenderer.drawString(text, x, y, color, shadow);
     }
     
     public int getStringWidth(final String text) {
         if (esohack.moduleManager.isModuleEnabled(FontMod.class)) {
             return this.customFont.getStringWidth(text);
         }
-        return TextManager.mc.field_71466_p.func_78256_a(text);
+        return TextManager.mc.fontRenderer.getStringWidth(text);
     }
     
     public int getFontHeight() {
@@ -64,7 +64,7 @@ public class TextManager extends Feature
             final String text = "A";
             return this.customFont.getStringHeight(text);
         }
-        return TextManager.mc.field_71466_p.field_78288_b;
+        return TextManager.mc.fontRenderer.FONT_HEIGHT;
     }
     
     public void setFontRenderer(final Font font, final boolean antiAlias, final boolean fractionalMetrics) {
@@ -76,11 +76,11 @@ public class TextManager extends Feature
     }
     
     public void updateResolution() {
-        this.scaledWidth = TextManager.mc.field_71443_c;
-        this.scaledHeight = TextManager.mc.field_71440_d;
+        this.scaledWidth = TextManager.mc.displayWidth;
+        this.scaledHeight = TextManager.mc.displayHeight;
         this.scaleFactor = 1;
-        final boolean flag = TextManager.mc.func_152349_b();
-        int i = TextManager.mc.field_71474_y.field_74335_Z;
+        final boolean flag = TextManager.mc.isUnicode();
+        int i = TextManager.mc.gameSettings.guiScale;
         if (i == 0) {
             i = 1000;
         }
@@ -92,8 +92,8 @@ public class TextManager extends Feature
         }
         final double scaledWidthD = this.scaledWidth / (double)this.scaleFactor;
         final double scaledHeightD = this.scaledHeight / (double)this.scaleFactor;
-        this.scaledWidth = MathHelper.func_76143_f(scaledWidthD);
-        this.scaledHeight = MathHelper.func_76143_f(scaledHeightD);
+        this.scaledWidth = MathHelper.ceil(scaledWidthD);
+        this.scaledHeight = MathHelper.ceil(scaledHeightD);
     }
     
     public String getIdleSign() {

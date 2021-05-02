@@ -81,8 +81,8 @@ public class HoleFiller extends Module
     public void onPacketSend(final PacketEvent.Send event) {
         final Packet packet = event.getPacket();
         if (packet instanceof CPacketPlayer && HoleFiller.isSpoofingAngles) {
-            ((CPacketPlayer)packet).field_149476_e = (float)HoleFiller.yaw;
-            ((CPacketPlayer)packet).field_149473_f = (float)HoleFiller.pitch;
+            ((CPacketPlayer)packet).yaw = (float)HoleFiller.yaw;
+            ((CPacketPlayer)packet).pitch = (float)HoleFiller.pitch;
         }
     }
     
@@ -96,7 +96,7 @@ public class HoleFiller extends Module
     
     @Override
     public void onUpdate() {
-        if (HoleFiller.mc.field_71441_e == null) {
+        if (HoleFiller.mc.world == null) {
             return;
         }
         if (this.smart.getValue()) {
@@ -107,10 +107,10 @@ public class HoleFiller extends Module
         final double dist = 0.0;
         final double prevDist = 0.0;
         final int n;
-        int obsidianSlot = n = ((HoleFiller.mc.field_71439_g.func_184614_ca().func_77973_b() == Item.func_150898_a(Blocks.field_150343_Z)) ? HoleFiller.mc.field_71439_g.field_71071_by.field_70461_c : -1);
+        int obsidianSlot = n = ((HoleFiller.mc.player.getHeldItemMainhand().getItem() == Item.getItemFromBlock(Blocks.OBSIDIAN)) ? HoleFiller.mc.player.inventory.currentItem : -1);
         if (obsidianSlot == -1) {
             for (int l = 0; l < 9; ++l) {
-                if (HoleFiller.mc.field_71439_g.field_71071_by.func_70301_a(l).func_77973_b() == Item.func_150898_a(Blocks.field_150343_Z)) {
+                if (HoleFiller.mc.player.inventory.getStackInSlot(l).getItem() == Item.getItemFromBlock(Blocks.OBSIDIAN)) {
                     obsidianSlot = l;
                     break;
                 }
@@ -120,7 +120,7 @@ public class HoleFiller extends Module
             return;
         }
         for (final BlockPos blockPos : blocks) {
-            if (!HoleFiller.mc.field_71441_e.func_72872_a((Class)Entity.class, new AxisAlignedBB(blockPos)).isEmpty()) {
+            if (!HoleFiller.mc.world.getEntitiesWithinAABB((Class)Entity.class, new AxisAlignedBB(blockPos)).isEmpty()) {
                 continue;
             }
             if (this.smart.getValue() && this.isInRange(blockPos)) {
@@ -131,15 +131,15 @@ public class HoleFiller extends Module
             }
         }
         this.render = q;
-        if (q != null && HoleFiller.mc.field_71439_g.field_70122_E) {
-            final int oldSlot = HoleFiller.mc.field_71439_g.field_71071_by.field_70461_c;
-            if (HoleFiller.mc.field_71439_g.field_71071_by.field_70461_c != obsidianSlot) {
-                HoleFiller.mc.field_71439_g.field_71071_by.field_70461_c = obsidianSlot;
+        if (q != null && HoleFiller.mc.player.onGround) {
+            final int oldSlot = HoleFiller.mc.player.inventory.currentItem;
+            if (HoleFiller.mc.player.inventory.currentItem != obsidianSlot) {
+                HoleFiller.mc.player.inventory.currentItem = obsidianSlot;
             }
-            this.lookAtPacket(q.func_177958_n() + 0.5, q.func_177956_o() - 0.5, q.func_177952_p() + 0.5, (EntityPlayer)HoleFiller.mc.field_71439_g);
+            this.lookAtPacket(q.getX() + 0.5, q.getY() - 0.5, q.getZ() + 0.5, (EntityPlayer)HoleFiller.mc.player);
             BlockUtil.placeBlockScaffold(this.render);
-            HoleFiller.mc.field_71439_g.func_184609_a(EnumHand.MAIN_HAND);
-            HoleFiller.mc.field_71439_g.field_71071_by.field_70461_c = oldSlot;
+            HoleFiller.mc.player.swingArm(EnumHand.MAIN_HAND);
+            HoleFiller.mc.player.inventory.currentItem = oldSlot;
             resetRotation();
         }
     }
@@ -152,9 +152,9 @@ public class HoleFiller extends Module
     }
     
     private double getDistanceToBlockPos(final BlockPos pos1, final BlockPos pos2) {
-        final double x = pos1.func_177958_n() - pos2.func_177958_n();
-        final double y = pos1.func_177956_o() - pos2.func_177956_o();
-        final double z = pos1.func_177952_p() - pos2.func_177952_p();
+        final double x = pos1.getX() - pos2.getX();
+        final double y = pos1.getY() - pos2.getY();
+        final double z = pos1.getZ() - pos2.getZ();
         return Math.sqrt(x * x + y * y + z * z);
     }
     
@@ -164,42 +164,42 @@ public class HoleFiller extends Module
     }
     
     private boolean IsHole(final BlockPos blockPos) {
-        final BlockPos boost = blockPos.func_177982_a(0, 1, 0);
-        final BlockPos boost2 = blockPos.func_177982_a(0, 0, 0);
-        final BlockPos boost3 = blockPos.func_177982_a(0, 0, -1);
-        final BlockPos boost4 = blockPos.func_177982_a(1, 0, 0);
-        final BlockPos boost5 = blockPos.func_177982_a(-1, 0, 0);
-        final BlockPos boost6 = blockPos.func_177982_a(0, 0, 1);
-        final BlockPos boost7 = blockPos.func_177982_a(0, 2, 0);
-        final BlockPos boost8 = blockPos.func_177963_a(0.5, 0.5, 0.5);
-        final BlockPos boost9 = blockPos.func_177982_a(0, -1, 0);
-        return HoleFiller.mc.field_71441_e.func_180495_p(boost).func_177230_c() == Blocks.field_150350_a && HoleFiller.mc.field_71441_e.func_180495_p(boost2).func_177230_c() == Blocks.field_150350_a && HoleFiller.mc.field_71441_e.func_180495_p(boost7).func_177230_c() == Blocks.field_150350_a && (HoleFiller.mc.field_71441_e.func_180495_p(boost3).func_177230_c() == Blocks.field_150343_Z || HoleFiller.mc.field_71441_e.func_180495_p(boost3).func_177230_c() == Blocks.field_150357_h) && (HoleFiller.mc.field_71441_e.func_180495_p(boost4).func_177230_c() == Blocks.field_150343_Z || HoleFiller.mc.field_71441_e.func_180495_p(boost4).func_177230_c() == Blocks.field_150357_h) && (HoleFiller.mc.field_71441_e.func_180495_p(boost5).func_177230_c() == Blocks.field_150343_Z || HoleFiller.mc.field_71441_e.func_180495_p(boost5).func_177230_c() == Blocks.field_150357_h) && (HoleFiller.mc.field_71441_e.func_180495_p(boost6).func_177230_c() == Blocks.field_150343_Z || HoleFiller.mc.field_71441_e.func_180495_p(boost6).func_177230_c() == Blocks.field_150357_h) && HoleFiller.mc.field_71441_e.func_180495_p(boost8).func_177230_c() == Blocks.field_150350_a && (HoleFiller.mc.field_71441_e.func_180495_p(boost9).func_177230_c() == Blocks.field_150343_Z || HoleFiller.mc.field_71441_e.func_180495_p(boost9).func_177230_c() == Blocks.field_150357_h);
+        final BlockPos boost = blockPos.add(0, 1, 0);
+        final BlockPos boost2 = blockPos.add(0, 0, 0);
+        final BlockPos boost3 = blockPos.add(0, 0, -1);
+        final BlockPos boost4 = blockPos.add(1, 0, 0);
+        final BlockPos boost5 = blockPos.add(-1, 0, 0);
+        final BlockPos boost6 = blockPos.add(0, 0, 1);
+        final BlockPos boost7 = blockPos.add(0, 2, 0);
+        final BlockPos boost8 = blockPos.add(0.5, 0.5, 0.5);
+        final BlockPos boost9 = blockPos.add(0, -1, 0);
+        return HoleFiller.mc.world.getBlockState(boost).getBlock() == Blocks.AIR && HoleFiller.mc.world.getBlockState(boost2).getBlock() == Blocks.AIR && HoleFiller.mc.world.getBlockState(boost7).getBlock() == Blocks.AIR && (HoleFiller.mc.world.getBlockState(boost3).getBlock() == Blocks.OBSIDIAN || HoleFiller.mc.world.getBlockState(boost3).getBlock() == Blocks.BEDROCK) && (HoleFiller.mc.world.getBlockState(boost4).getBlock() == Blocks.OBSIDIAN || HoleFiller.mc.world.getBlockState(boost4).getBlock() == Blocks.BEDROCK) && (HoleFiller.mc.world.getBlockState(boost5).getBlock() == Blocks.OBSIDIAN || HoleFiller.mc.world.getBlockState(boost5).getBlock() == Blocks.BEDROCK) && (HoleFiller.mc.world.getBlockState(boost6).getBlock() == Blocks.OBSIDIAN || HoleFiller.mc.world.getBlockState(boost6).getBlock() == Blocks.BEDROCK) && HoleFiller.mc.world.getBlockState(boost8).getBlock() == Blocks.AIR && (HoleFiller.mc.world.getBlockState(boost9).getBlock() == Blocks.OBSIDIAN || HoleFiller.mc.world.getBlockState(boost9).getBlock() == Blocks.BEDROCK);
     }
     
     public static BlockPos getPlayerPos() {
-        return new BlockPos(Math.floor(HoleFiller.mc.field_71439_g.field_70165_t), Math.floor(HoleFiller.mc.field_71439_g.field_70163_u), Math.floor(HoleFiller.mc.field_71439_g.field_70161_v));
+        return new BlockPos(Math.floor(HoleFiller.mc.player.posX), Math.floor(HoleFiller.mc.player.posY), Math.floor(HoleFiller.mc.player.posZ));
     }
     
     public BlockPos getClosestTargetPos() {
         if (this.closestTarget != null) {
-            return new BlockPos(Math.floor(this.closestTarget.field_70165_t), Math.floor(this.closestTarget.field_70163_u), Math.floor(this.closestTarget.field_70161_v));
+            return new BlockPos(Math.floor(this.closestTarget.posX), Math.floor(this.closestTarget.posY), Math.floor(this.closestTarget.posZ));
         }
         return null;
     }
     
     private void findClosestTarget() {
-        final List<EntityPlayer> playerList = (List<EntityPlayer>)HoleFiller.mc.field_71441_e.field_73010_i;
+        final List<EntityPlayer> playerList = (List<EntityPlayer>)HoleFiller.mc.world.playerEntities;
         this.closestTarget = null;
         for (final EntityPlayer target : playerList) {
-            if (target != HoleFiller.mc.field_71439_g && !esohack.friendManager.isFriend(target.func_70005_c_()) && EntityUtil.isLiving((Entity)target)) {
-                if (target.func_110143_aJ() <= 0.0f) {
+            if (target != HoleFiller.mc.player && !esohack.friendManager.isFriend(target.getName()) && EntityUtil.isLiving((Entity)target)) {
+                if (target.getHealth() <= 0.0f) {
                     continue;
                 }
                 if (this.closestTarget == null) {
                     this.closestTarget = target;
                 }
                 else {
-                    if (HoleFiller.mc.field_71439_g.func_70032_d((Entity)target) >= HoleFiller.mc.field_71439_g.func_70032_d((Entity)this.closestTarget)) {
+                    if (HoleFiller.mc.player.getDistance((Entity)target) >= HoleFiller.mc.player.getDistance((Entity)this.closestTarget)) {
                         continue;
                     }
                     this.closestTarget = target;
@@ -209,13 +209,13 @@ public class HoleFiller extends Module
     }
     
     private boolean isInRange(final BlockPos blockPos) {
-        final NonNullList positions = NonNullList.func_191196_a();
+        final NonNullList positions = NonNullList.create();
         positions.addAll((Collection)this.getSphere(getPlayerPos(), this.range.getValue().floatValue(), this.range.getValue().intValue(), false, true, 0).stream().filter((Predicate<? super Object>)this::IsHole).collect((Collector<? super Object, ?, List<? super Object>>)Collectors.toList()));
         return positions.contains((Object)blockPos);
     }
     
     private List<BlockPos> findCrystalBlocks() {
-        final NonNullList positions = NonNullList.func_191196_a();
+        final NonNullList positions = NonNullList.create();
         if (this.smart.getValue() && this.closestTarget != null) {
             positions.addAll((Collection)this.getSphere(this.getClosestTargetPos(), this.smartRange.getValue(), this.range.getValue().intValue(), false, true, 0).stream().filter((Predicate<? super Object>)this::IsHole).filter((Predicate<? super Object>)this::isInRange).collect((Collector<? super Object, ?, List<? super Object>>)Collectors.toList()));
         }
@@ -227,9 +227,9 @@ public class HoleFiller extends Module
     
     public List<BlockPos> getSphere(final BlockPos loc, final float r, final int h, final boolean hollow, final boolean sphere, final int plus_y) {
         final ArrayList<BlockPos> circleblocks = new ArrayList<BlockPos>();
-        final int cx = loc.func_177958_n();
-        final int cy = loc.func_177956_o();
-        final int cz = loc.func_177952_p();
+        final int cx = loc.getX();
+        final int cy = loc.getY();
+        final int cz = loc.getZ();
         for (int x = cx - (int)r; x <= cx + r; ++x) {
             for (int z = cz - (int)r; z <= cz + r; ++z) {
                 int y = sphere ? (cy - (int)r) : cy;
@@ -259,8 +259,8 @@ public class HoleFiller extends Module
     
     private static void resetRotation() {
         if (HoleFiller.isSpoofingAngles) {
-            HoleFiller.yaw = HoleFiller.mc.field_71439_g.field_70177_z;
-            HoleFiller.pitch = HoleFiller.mc.field_71439_g.field_70125_A;
+            HoleFiller.yaw = HoleFiller.mc.player.rotationYaw;
+            HoleFiller.pitch = HoleFiller.mc.player.rotationPitch;
             HoleFiller.isSpoofingAngles = false;
         }
     }

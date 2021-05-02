@@ -44,26 +44,26 @@ public class Burrow extends Module
     @Override
     public void onEnable() {
         super.onEnable();
-        this.originalPos = new BlockPos(Burrow.mc.field_71439_g.field_70165_t, Burrow.mc.field_71439_g.field_70163_u, Burrow.mc.field_71439_g.field_70161_v);
+        this.originalPos = new BlockPos(Burrow.mc.player.posX, Burrow.mc.player.posY, Burrow.mc.player.posZ);
         switch (this.mode.getValue()) {
             case OBBY: {
-                this.returnBlock = Blocks.field_150343_Z;
+                this.returnBlock = Blocks.OBSIDIAN;
                 break;
             }
             case ECHEST: {
-                this.returnBlock = Blocks.field_150477_bB;
+                this.returnBlock = Blocks.ENDER_CHEST;
                 break;
             }
             case CHEST: {
-                this.returnBlock = (Block)Blocks.field_150486_ae;
+                this.returnBlock = (Block)Blocks.CHEST;
                 break;
             }
         }
-        if (Burrow.mc.field_71441_e.func_180495_p(new BlockPos(Burrow.mc.field_71439_g.field_70165_t, Burrow.mc.field_71439_g.field_70163_u, Burrow.mc.field_71439_g.field_70161_v)).func_177230_c().equals(this.returnBlock) || this.intersectsWithEntity(this.originalPos)) {
+        if (Burrow.mc.world.getBlockState(new BlockPos(Burrow.mc.player.posX, Burrow.mc.player.posY, Burrow.mc.player.posZ)).getBlock().equals(this.returnBlock) || this.intersectsWithEntity(this.originalPos)) {
             this.toggle();
             return;
         }
-        this.oldSlot = Burrow.mc.field_71439_g.field_71071_by.field_70461_c;
+        this.oldSlot = Burrow.mc.player.inventory.currentItem;
     }
     
     @Override
@@ -108,27 +108,27 @@ public class Burrow extends Module
                 break;
             }
         }
-        Burrow.mc.field_71439_g.field_71174_a.func_147297_a((Packet)new CPacketPlayer.Position(Burrow.mc.field_71439_g.field_70165_t, Burrow.mc.field_71439_g.field_70163_u + 0.41999998688698, Burrow.mc.field_71439_g.field_70161_v, true));
-        Burrow.mc.field_71439_g.field_71174_a.func_147297_a((Packet)new CPacketPlayer.Position(Burrow.mc.field_71439_g.field_70165_t, Burrow.mc.field_71439_g.field_70163_u + 0.7531999805211997, Burrow.mc.field_71439_g.field_70161_v, true));
-        Burrow.mc.field_71439_g.field_71174_a.func_147297_a((Packet)new CPacketPlayer.Position(Burrow.mc.field_71439_g.field_70165_t, Burrow.mc.field_71439_g.field_70163_u + 1.00133597911214, Burrow.mc.field_71439_g.field_70161_v, true));
-        Burrow.mc.field_71439_g.field_71174_a.func_147297_a((Packet)new CPacketPlayer.Position(Burrow.mc.field_71439_g.field_70165_t, Burrow.mc.field_71439_g.field_70163_u + 1.16610926093821, Burrow.mc.field_71439_g.field_70161_v, true));
+        Burrow.mc.player.connection.sendPacket((Packet)new CPacketPlayer.Position(Burrow.mc.player.posX, Burrow.mc.player.posY + 0.41999998688698, Burrow.mc.player.posZ, true));
+        Burrow.mc.player.connection.sendPacket((Packet)new CPacketPlayer.Position(Burrow.mc.player.posX, Burrow.mc.player.posY + 0.7531999805211997, Burrow.mc.player.posZ, true));
+        Burrow.mc.player.connection.sendPacket((Packet)new CPacketPlayer.Position(Burrow.mc.player.posX, Burrow.mc.player.posY + 1.00133597911214, Burrow.mc.player.posZ, true));
+        Burrow.mc.player.connection.sendPacket((Packet)new CPacketPlayer.Position(Burrow.mc.player.posX, Burrow.mc.player.posY + 1.16610926093821, Burrow.mc.player.posZ, true));
         BurrowUtil.placeBlock(this.originalPos, EnumHand.MAIN_HAND, this.rotate.getValue(), true, false);
-        Burrow.mc.field_71439_g.field_71174_a.func_147297_a((Packet)new CPacketPlayer.Position(Burrow.mc.field_71439_g.field_70165_t, Burrow.mc.field_71439_g.field_70163_u + this.offset.getValue(), Burrow.mc.field_71439_g.field_70161_v, false));
-        Burrow.mc.field_71439_g.field_71174_a.func_147297_a((Packet)new CPacketEntityAction((Entity)Burrow.mc.field_71439_g, CPacketEntityAction.Action.STOP_SNEAKING));
-        Burrow.mc.field_71439_g.func_70095_a(false);
+        Burrow.mc.player.connection.sendPacket((Packet)new CPacketPlayer.Position(Burrow.mc.player.posX, Burrow.mc.player.posY + this.offset.getValue(), Burrow.mc.player.posZ, false));
+        Burrow.mc.player.connection.sendPacket((Packet)new CPacketEntityAction((Entity)Burrow.mc.player, CPacketEntityAction.Action.STOP_SNEAKING));
+        Burrow.mc.player.setSneaking(false);
         BurrowUtil.switchToSlot(this.oldSlot);
         this.toggle();
     }
     
     private boolean intersectsWithEntity(final BlockPos pos) {
-        for (final Entity entity : Burrow.mc.field_71441_e.field_72996_f) {
-            if (entity.equals((Object)Burrow.mc.field_71439_g)) {
+        for (final Entity entity : Burrow.mc.world.loadedEntityList) {
+            if (entity.equals((Object)Burrow.mc.player)) {
                 continue;
             }
             if (entity instanceof EntityItem) {
                 continue;
             }
-            if (new AxisAlignedBB(pos).func_72326_a(entity.func_174813_aQ())) {
+            if (new AxisAlignedBB(pos).intersects(entity.getEntityBoundingBox())) {
                 return true;
             }
         }

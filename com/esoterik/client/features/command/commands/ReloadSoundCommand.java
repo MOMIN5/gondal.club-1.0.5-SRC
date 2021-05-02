@@ -18,8 +18,8 @@ public class ReloadSoundCommand extends Command
     @Override
     public void execute(final String[] commands) {
         try {
-            final SoundManager sndManager = (SoundManager)ObfuscationReflectionHelper.getPrivateValue((Class)SoundHandler.class, (Object)ReloadSoundCommand.mc.func_147118_V(), new String[] { "sndManager", "field_147694_f" });
-            sndManager.func_148596_a();
+            final SoundManager sndManager = (SoundManager)ObfuscationReflectionHelper.getPrivateValue((Class)SoundHandler.class, (Object)ReloadSoundCommand.mc.getSoundHandler(), new String[] { "sndManager", "field_147694_f" });
+            sndManager.reloadSoundSystem();
             Command.sendMessage("§aReloaded Sound System.");
         }
         catch (Exception e) {

@@ -26,10 +26,10 @@ public class Render2DEvent extends EventStage
     }
     
     public double getScreenWidth() {
-        return this.scaledResolution.func_78327_c();
+        return this.scaledResolution.getScaledWidth_double();
     }
     
     public double getScreenHeight() {
-        return this.scaledResolution.func_78324_d();
+        return this.scaledResolution.getScaledHeight_double();
     }
 }

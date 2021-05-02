@@ -60,7 +60,7 @@ public class ClickGui extends Module
     @Override
     public void onUpdate() {
         if (this.customFov.getValue()) {
-            ClickGui.mc.field_71474_y.func_74304_a(GameSettings.Options.FOV, (float)this.fov.getValue());
+            ClickGui.mc.gameSettings.setOptionFloatValue(GameSettings.Options.FOV, (float)this.fov.getValue());
         }
     }
     
@@ -77,7 +77,7 @@ public class ClickGui extends Module
     
     @Override
     public void onEnable() {
-        ClickGui.mc.func_147108_a((GuiScreen)new esohackGui());
+        ClickGui.mc.displayGuiScreen((GuiScreen)new esohackGui());
     }
     
     @Override
@@ -92,15 +92,15 @@ public class ClickGui extends Module
     
     @Override
     public void onTick() {
-        if (!(ClickGui.mc.field_71462_r instanceof esohackGui)) {
+        if (!(ClickGui.mc.currentScreen instanceof esohackGui)) {
             this.disable();
         }
     }
     
     @Override
     public void onDisable() {
-        if (ClickGui.mc.field_71462_r instanceof esohackGui) {
-            ClickGui.mc.func_147108_a((GuiScreen)null);
+        if (ClickGui.mc.currentScreen instanceof esohackGui) {
+            ClickGui.mc.displayGuiScreen((GuiScreen)null);
         }
     }
     

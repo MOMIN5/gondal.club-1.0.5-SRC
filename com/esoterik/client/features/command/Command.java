@@ -45,7 +45,7 @@ public abstract class Command extends Feature
         if (nullCheck()) {
             return;
         }
-        Command.mc.field_71439_g.func_145747_a((ITextComponent)new ChatMessage(message));
+        Command.mc.player.sendMessage((ITextComponent)new ChatMessage(message));
     }
     
     @Override
@@ -77,11 +77,11 @@ public abstract class Command extends Feature
             this.text = stringBuffer.toString();
         }
         
-        public String func_150261_e() {
+        public String getUnformattedComponentText() {
             return this.text;
         }
         
-        public ITextComponent func_150259_f() {
+        public ITextComponent createCopy() {
             return (ITextComponent)new ChatMessage(this.text);
         }
     }

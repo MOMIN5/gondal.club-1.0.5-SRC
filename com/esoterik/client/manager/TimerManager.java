@@ -23,14 +23,14 @@ public class TimerManager extends Feature
     
     public void unload() {
         this.timer = 1.0f;
-        TimerManager.mc.field_71428_T.field_194149_e = 50.0f;
+        TimerManager.mc.timer.tickLength = 50.0f;
     }
     
     public void update() {
         if (this.module != null && this.module.isEnabled()) {
             this.timer = this.module.speed;
         }
-        TimerManager.mc.field_71428_T.field_194149_e = 50.0f / ((this.timer <= 0.0f) ? 0.1f : this.timer);
+        TimerManager.mc.timer.tickLength = 50.0f / ((this.timer <= 0.0f) ? 0.1f : this.timer);
     }
     
     public void setTimer(final float timer) {

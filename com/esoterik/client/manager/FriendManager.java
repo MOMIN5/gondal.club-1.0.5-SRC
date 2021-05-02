@@ -30,7 +30,7 @@ public class FriendManager extends Feature
     }
     
     public boolean isFriend(final EntityPlayer player) {
-        return this.isFriend(player.func_70005_c_());
+        return this.isFriend(player.getName());
     }
     
     public void addFriend(final String name) {

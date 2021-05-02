@@ -71,8 +71,8 @@ public class AutoTrap extends Module
             return;
         }
         super.onEnable();
-        this.startPos = EntityUtil.getRoundedBlockPos((Entity)AutoTrap.mc.field_71439_g);
-        this.lastHotbarSlot = AutoTrap.mc.field_71439_g.field_71071_by.field_70461_c;
+        this.startPos = EntityUtil.getRoundedBlockPos((Entity)AutoTrap.mc.player);
+        this.lastHotbarSlot = AutoTrap.mc.player.inventory.currentItem;
         this.retries.clear();
     }
     
@@ -88,7 +88,7 @@ public class AutoTrap extends Module
     @Override
     public String getDisplayInfo() {
         if (this.target != null) {
-            return this.target.func_70005_c_();
+            return this.target.getName();
         }
         return null;
     }
@@ -111,13 +111,13 @@ public class AutoTrap extends Module
     }
     
     private void doStaticTrap() {
-        final List<Vec3d> placeTargets = EntityUtil.targets(this.target.func_174791_d(), this.antiScaffold.getValue(), this.antiStep.getValue(), false, false, false, this.raytrace.getValue(), true);
+        final List<Vec3d> placeTargets = EntityUtil.targets(this.target.getPositionVector(), this.antiScaffold.getValue(), this.antiStep.getValue(), false, false, false, this.raytrace.getValue(), true);
         this.placeList(placeTargets);
     }
     
     private void placeList(final List<Vec3d> list) {
-        list.sort((vec3d, vec3d2) -> Double.compare(AutoTrap.mc.field_71439_g.func_70092_e(vec3d2.field_72450_a, vec3d2.field_72448_b, vec3d2.field_72449_c), AutoTrap.mc.field_71439_g.func_70092_e(vec3d.field_72450_a, vec3d.field_72448_b, vec3d.field_72449_c)));
-        list.sort(Comparator.comparingDouble(vec3d -> vec3d.field_72448_b));
+        list.sort((vec3d, vec3d2) -> Double.compare(AutoTrap.mc.player.getDistanceSq(vec3d2.x, vec3d2.y, vec3d2.z), AutoTrap.mc.player.getDistanceSq(vec3d.x, vec3d.y, vec3d.z)));
+        list.sort(Comparator.comparingDouble(vec3d -> vec3d.y));
         for (final Vec3d vec3d3 : list) {
             final BlockPos position = new BlockPos(vec3d3);
             final int placeability = BlockUtil.isPositionPlaceable(position, this.raytrace.getValue());
@@ -147,7 +147,7 @@ public class AutoTrap extends Module
         if (this.isOff()) {
             return true;
         }
-        if (!this.startPos.equals((Object)EntityUtil.getRoundedBlockPos((Entity)AutoTrap.mc.field_71439_g))) {
+        if (!this.startPos.equals((Object)EntityUtil.getRoundedBlockPos((Entity)AutoTrap.mc.player))) {
             this.disable();
             return true;
         }
@@ -160,8 +160,8 @@ public class AutoTrap extends Module
             this.disable();
             return true;
         }
-        if (AutoTrap.mc.field_71439_g.field_71071_by.field_70461_c != this.lastHotbarSlot && AutoTrap.mc.field_71439_g.field_71071_by.field_70461_c != obbySlot3) {
-            this.lastHotbarSlot = AutoTrap.mc.field_71439_g.field_71071_by.field_70461_c;
+        if (AutoTrap.mc.player.inventory.currentItem != this.lastHotbarSlot && AutoTrap.mc.player.inventory.currentItem != obbySlot3) {
+            this.lastHotbarSlot = AutoTrap.mc.player.inventory.currentItem;
         }
         this.isSneaking = EntityUtil.stopSneaking(this.isSneaking);
         this.target = this.getTarget(10.0, true);
@@ -171,21 +171,21 @@ public class AutoTrap extends Module
     private EntityPlayer getTarget(final double range, final boolean trapped) {
         EntityPlayer target = null;
         double distance = Math.pow(range, 2.0) + 1.0;
-        for (final EntityPlayer player : AutoTrap.mc.field_71441_e.field_73010_i) {
+        for (final EntityPlayer player : AutoTrap.mc.world.playerEntities) {
             if (!EntityUtil.isntValid((Entity)player, range) && (!trapped || !EntityUtil.isTrapped(player, this.antiScaffold.getValue(), this.antiStep.getValue(), false, false, false, true))) {
                 if (esohack.speedManager.getPlayerSpeed(player) > 10.0) {
                     continue;
                 }
                 if (target == null) {
                     target = player;
-                    distance = AutoTrap.mc.field_71439_g.func_70068_e((Entity)player);
+                    distance = AutoTrap.mc.player.getDistanceSq((Entity)player);
                 }
                 else {
-                    if (AutoTrap.mc.field_71439_g.func_70068_e((Entity)player) >= distance) {
+                    if (AutoTrap.mc.player.getDistanceSq((Entity)player) >= distance) {
                         continue;
                     }
                     target = player;
-                    distance = AutoTrap.mc.field_71439_g.func_70068_e((Entity)player);
+                    distance = AutoTrap.mc.player.getDistanceSq((Entity)player);
                 }
             }
         }
@@ -193,27 +193,27 @@ public class AutoTrap extends Module
     }
     
     private void placeBlock(final BlockPos pos) {
-        if (this.placements < this.blocksPerPlace.getValue() && AutoTrap.mc.field_71439_g.func_174818_b(pos) <= MathUtil.square(5.0)) {
+        if (this.placements < this.blocksPerPlace.getValue() && AutoTrap.mc.player.getDistanceSq(pos) <= MathUtil.square(5.0)) {
             AutoTrap.isPlacing = true;
-            final int originalSlot = AutoTrap.mc.field_71439_g.field_71071_by.field_70461_c;
+            final int originalSlot = AutoTrap.mc.player.inventory.currentItem;
             final int obbySlot = InventoryUtil.findHotbarBlock(BlockObsidian.class);
             final int eChestSot = InventoryUtil.findHotbarBlock(BlockEnderChest.class);
             if (obbySlot == -1 && eChestSot == -1) {
                 this.toggle();
             }
             if (this.smartRotate) {
-                AutoTrap.mc.field_71439_g.field_71071_by.field_70461_c = ((obbySlot == -1) ? eChestSot : obbySlot);
-                AutoTrap.mc.field_71442_b.func_78765_e();
+                AutoTrap.mc.player.inventory.currentItem = ((obbySlot == -1) ? eChestSot : obbySlot);
+                AutoTrap.mc.playerController.updateController();
                 this.isSneaking = BlockUtil.placeBlockSmartRotate(pos, EnumHand.MAIN_HAND, true, true, this.isSneaking);
-                AutoTrap.mc.field_71439_g.field_71071_by.field_70461_c = originalSlot;
-                AutoTrap.mc.field_71442_b.func_78765_e();
+                AutoTrap.mc.player.inventory.currentItem = originalSlot;
+                AutoTrap.mc.playerController.updateController();
             }
             else {
-                AutoTrap.mc.field_71439_g.field_71071_by.field_70461_c = ((obbySlot == -1) ? eChestSot : obbySlot);
-                AutoTrap.mc.field_71442_b.func_78765_e();
+                AutoTrap.mc.player.inventory.currentItem = ((obbySlot == -1) ? eChestSot : obbySlot);
+                AutoTrap.mc.playerController.updateController();
                 this.isSneaking = BlockUtil.placeBlock(pos, EnumHand.MAIN_HAND, this.rotate.getValue(), true, this.isSneaking);
-                AutoTrap.mc.field_71439_g.field_71071_by.field_70461_c = originalSlot;
-                AutoTrap.mc.field_71442_b.func_78765_e();
+                AutoTrap.mc.player.inventory.currentItem = originalSlot;
+                AutoTrap.mc.playerController.updateController();
             }
             this.didPlace = true;
             ++this.placements;

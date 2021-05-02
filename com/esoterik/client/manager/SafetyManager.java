@@ -46,10 +46,10 @@ public class SafetyManager extends Feature implements Runnable
                 this.SAFE.set(true);
                 return;
             }
-            final ArrayList<Entity> crystals = new ArrayList<Entity>(SafetyManager.mc.field_71441_e.field_72996_f);
+            final ArrayList<Entity> crystals = new ArrayList<Entity>(SafetyManager.mc.world.loadedEntityList);
             for (final Entity crystal : crystals) {
-                if (crystal instanceof EntityEnderCrystal && DamageUtil.calculateDamage(crystal, (Entity)SafetyManager.mc.field_71439_g) > 4.0) {
-                    if (closest != null && closest.func_70068_e(crystal) >= 40.0) {
+                if (crystal instanceof EntityEnderCrystal && DamageUtil.calculateDamage(crystal, (Entity)SafetyManager.mc.player) > 4.0) {
+                    if (closest != null && closest.getDistanceSq(crystal) >= 40.0) {
                         continue;
                     }
                     safe = false;
@@ -58,8 +58,8 @@ public class SafetyManager extends Feature implements Runnable
             }
             if (safe) {
                 for (final BlockPos pos : BlockUtil.possiblePlacePositions(4.0f, false, Managers.getInstance().oneDot15.getValue())) {
-                    if (DamageUtil.calculateDamage(pos, (Entity)SafetyManager.mc.field_71439_g) > 4.0) {
-                        if (closest != null && closest.func_174818_b(pos) >= 40.0) {
+                    if (DamageUtil.calculateDamage(pos, (Entity)SafetyManager.mc.player) > 4.0) {
+                        if (closest != null && closest.getDistanceSq(pos) >= 40.0) {
                             continue;
                         }
                         safe = false;

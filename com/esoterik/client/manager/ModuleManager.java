@@ -246,7 +246,7 @@ public class ModuleManager extends Feature
     }
     
     public void onKeyPressed(final int eventKey) {
-        if (eventKey == 0 || !Keyboard.getEventKeyState() || ModuleManager.mc.field_71462_r instanceof esohackGui) {
+        if (eventKey == 0 || !Keyboard.getEventKeyState() || ModuleManager.mc.currentScreen instanceof esohackGui) {
             return;
         }
         ModuleManager.modules.forEach(module -> {

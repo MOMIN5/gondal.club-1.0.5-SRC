@@ -18,8 +18,8 @@ public class ItemUtil implements Minecraftable
     public static int getItemFromHotbar(final Item item) {
         int slot = -1;
         for (int i = 0; i < 9; ++i) {
-            final ItemStack stack = ItemUtil.mc.field_71439_g.field_71071_by.func_70301_a(i);
-            if (stack.func_77973_b() == item) {
+            final ItemStack stack = ItemUtil.mc.player.inventory.getStackInSlot(i);
+            if (stack.getItem() == item) {
                 slot = i;
             }
         }
@@ -29,7 +29,7 @@ public class ItemUtil implements Minecraftable
     public static int getItemSlot(final Class clss) {
         int itemSlot = -1;
         for (int i = 45; i > 0; --i) {
-            if (ItemUtil.mc.field_71439_g.field_71071_by.func_70301_a(i).func_77973_b().getClass() == clss) {
+            if (ItemUtil.mc.player.inventory.getStackInSlot(i).getItem().getClass() == clss) {
                 itemSlot = i;
                 break;
             }
@@ -40,7 +40,7 @@ public class ItemUtil implements Minecraftable
     public static int getItemSlot(final Item item) {
         int itemSlot = -1;
         for (int i = 45; i > 0; --i) {
-            if (ItemUtil.mc.field_71439_g.field_71071_by.func_70301_a(i).func_77973_b().equals(item)) {
+            if (ItemUtil.mc.player.inventory.getStackInSlot(i).getItem().equals(item)) {
                 itemSlot = i;
                 break;
             }
@@ -50,21 +50,21 @@ public class ItemUtil implements Minecraftable
     
     public static int getItemCount(final Item item) {
         int count = 0;
-        for (int size = ItemUtil.mc.field_71439_g.field_71071_by.field_70462_a.size(), i = 0; i < size; ++i) {
-            final ItemStack itemStack = (ItemStack)ItemUtil.mc.field_71439_g.field_71071_by.field_70462_a.get(i);
-            if (itemStack.func_77973_b() == item) {
-                count += itemStack.func_190916_E();
+        for (int size = ItemUtil.mc.player.inventory.mainInventory.size(), i = 0; i < size; ++i) {
+            final ItemStack itemStack = (ItemStack)ItemUtil.mc.player.inventory.mainInventory.get(i);
+            if (itemStack.getItem() == item) {
+                count += itemStack.getCount();
             }
         }
-        final ItemStack offhandStack = ItemUtil.mc.field_71439_g.func_184592_cb();
-        if (offhandStack.func_77973_b() == item) {
-            count += offhandStack.func_190916_E();
+        final ItemStack offhandStack = ItemUtil.mc.player.getHeldItemOffhand();
+        if (offhandStack.getItem() == item) {
+            count += offhandStack.getCount();
         }
         return count;
     }
     
     public static boolean isArmorLow(final EntityPlayer player, final int durability) {
-        for (final ItemStack piece : player.field_71071_by.field_70460_b) {
+        for (final ItemStack piece : player.inventory.armorInventory) {
             if (piece != null && getDamageInPercent(piece) >= durability) {
                 continue;
             }
@@ -74,11 +74,11 @@ public class ItemUtil implements Minecraftable
     }
     
     public static int getItemDamage(final ItemStack stack) {
-        return stack.func_77958_k() - stack.func_77952_i();
+        return stack.getMaxDamage() - stack.getItemDamage();
     }
     
     public static float getDamageInPercent(final ItemStack stack) {
-        final float green = (stack.func_77958_k() - (float)stack.func_77952_i()) / stack.func_77958_k();
+        final float green = (stack.getMaxDamage() - (float)stack.getItemDamage()) / stack.getMaxDamage();
         final float red = 1.0f - green;
         return (float)(100 - (int)(red * 100.0f));
     }
@@ -88,7 +88,7 @@ public class ItemUtil implements Minecraftable
     }
     
     public static boolean hasDurability(final ItemStack stack) {
-        final Item item = stack.func_77973_b();
+        final Item item = stack.getItem();
         return item instanceof ItemArmor || item instanceof ItemSword || item instanceof ItemTool || item instanceof ItemShield;
     }
 }

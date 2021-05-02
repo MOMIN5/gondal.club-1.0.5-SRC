@@ -24,10 +24,10 @@ public abstract class MixinEntity
         final PushEvent event = new PushEvent(entity, x, y, z, true);
         MinecraftForge.EVENT_BUS.post((Event)event);
         if (!event.isCanceled()) {
-            entity.field_70159_w += event.x;
-            entity.field_70181_x += event.y;
-            entity.field_70179_y += event.z;
-            entity.field_70160_al = event.airbone;
+            entity.motionX += event.x;
+            entity.motionY += event.y;
+            entity.motionZ += event.z;
+            entity.isAirBorne = event.airbone;
         }
     }
 }

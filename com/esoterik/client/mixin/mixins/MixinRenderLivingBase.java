@@ -40,7 +40,7 @@ public abstract class MixinRenderLivingBase<T extends EntityLivingBase> extends 
                 }
             }
         }
-        modelBase.func_78088_a(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
+        modelBase.render(entityIn, limbSwing, limbSwingAmount, ageInTicks, netHeadYaw, headPitch, scale);
     }
     
     @Inject(method = { "doRender" }, at = { @At("HEAD") })

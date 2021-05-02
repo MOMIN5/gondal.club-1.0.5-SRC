@@ -22,7 +22,7 @@ import net.minecraft.block.Block;
 public class MixinBlockSoulSand extends Block
 {
     public MixinBlockSoulSand() {
-        super(Material.field_151595_p, MapColor.field_151650_B);
+        super(Material.SAND, MapColor.BROWN);
     }
     
     @Inject(method = { "onEntityCollision" }, at = { @At("HEAD") }, cancellable = true)

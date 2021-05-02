@@ -20,7 +20,7 @@ public class PacketManager extends Feature
     public void sendPacketNoEvent(final Packet<?> packet) {
         if (packet != null && !Feature.nullCheck()) {
             this.noEventPackets.add(packet);
-            PacketManager.mc.field_71439_g.field_71174_a.func_147297_a((Packet)packet);
+            PacketManager.mc.player.connection.sendPacket((Packet)packet);
         }
     }
     

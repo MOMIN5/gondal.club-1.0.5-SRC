@@ -38,7 +38,7 @@ public class EnumButton extends Button
     public void mouseClicked(final int mouseX, final int mouseY, final int mouseButton) {
         super.mouseClicked(mouseX, mouseY, mouseButton);
         if (this.isHovering(mouseX, mouseY)) {
-            EnumButton.mc.func_147118_V().func_147682_a((ISound)PositionedSoundRecord.func_184371_a(SoundEvents.field_187909_gi, 1.0f));
+            EnumButton.mc.getSoundHandler().playSound((ISound)PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0f));
         }
     }
     

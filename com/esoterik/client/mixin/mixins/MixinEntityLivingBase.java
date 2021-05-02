@@ -22,6 +22,6 @@ public abstract class MixinEntityLivingBase extends Entity
     
     @Inject(method = { "isElytraFlying" }, at = { @At("HEAD") }, cancellable = true)
     private void isElytraFlyingHook(final CallbackInfoReturnable<Boolean> info) {
-        if (Util.mc.field_71439_g == null || Util.mc.field_71439_g.equals((Object)this)) {}
+        if (Util.mc.player == null || Util.mc.player.equals((Object)this)) {}
     }
 }

@@ -104,7 +104,7 @@ public class HoleManager extends Feature implements Runnable
     
     public boolean isPlayerInHole() {
         for (final BlockPos pos : esohack.holeManager.getSortedHoles()) {
-            if (pos.equals((Object)new BlockPos(HoleESP.mc.field_71439_g.field_70165_t, HoleESP.mc.field_71439_g.field_70163_u, HoleESP.mc.field_71439_g.field_70161_v))) {
+            if (pos.equals((Object)new BlockPos(HoleESP.mc.player.posX, HoleESP.mc.player.posY, HoleESP.mc.player.posZ))) {
                 return true;
             }
         }
@@ -145,28 +145,28 @@ public class HoleManager extends Feature implements Runnable
     }
     
     public List<BlockPos> getSortedHoles() {
-        this.holes.sort(Comparator.comparingDouble(hole -> HoleManager.mc.field_71439_g.func_174818_b(hole)));
+        this.holes.sort(Comparator.comparingDouble(hole -> HoleManager.mc.player.getDistanceSq(hole)));
         return this.getHoles();
     }
     
     public List<BlockPos> calcHoles() {
         final ArrayList<BlockPos> safeSpots = new ArrayList<BlockPos>();
         this.midSafety.clear();
-        final List<BlockPos> positions = BlockUtil.getSphere(EntityUtil.getPlayerPos((EntityPlayer)HoleManager.mc.field_71439_g), Managers.getInstance().holeRange.getValue(), Managers.getInstance().holeRange.getValue().intValue(), false, true, 0);
+        final List<BlockPos> positions = BlockUtil.getSphere(EntityUtil.getPlayerPos((EntityPlayer)HoleManager.mc.player), Managers.getInstance().holeRange.getValue(), Managers.getInstance().holeRange.getValue().intValue(), false, true, 0);
         for (final BlockPos pos : positions) {
-            if (HoleManager.mc.field_71441_e.func_180495_p(pos).func_177230_c().equals(Blocks.field_150350_a) && HoleManager.mc.field_71441_e.func_180495_p(pos.func_177982_a(0, 1, 0)).func_177230_c().equals(Blocks.field_150350_a)) {
-                if (!HoleManager.mc.field_71441_e.func_180495_p(pos.func_177982_a(0, 2, 0)).func_177230_c().equals(Blocks.field_150350_a)) {
+            if (HoleManager.mc.world.getBlockState(pos).getBlock().equals(Blocks.AIR) && HoleManager.mc.world.getBlockState(pos.add(0, 1, 0)).getBlock().equals(Blocks.AIR)) {
+                if (!HoleManager.mc.world.getBlockState(pos.add(0, 2, 0)).getBlock().equals(Blocks.AIR)) {
                     continue;
                 }
                 boolean isSafe = true;
                 boolean midSafe = true;
                 for (final BlockPos offset : HoleManager.surroundOffset) {
-                    final Block block = HoleManager.mc.field_71441_e.func_180495_p(pos.func_177971_a((Vec3i)offset)).func_177230_c();
+                    final Block block = HoleManager.mc.world.getBlockState(pos.add((Vec3i)offset)).getBlock();
                     if (BlockUtil.isBlockUnSolid(block)) {
                         midSafe = false;
                     }
-                    if (block != Blocks.field_150357_h && block != Blocks.field_150343_Z && block != Blocks.field_150477_bB) {
-                        if (block != Blocks.field_150467_bQ) {
+                    if (block != Blocks.BEDROCK && block != Blocks.OBSIDIAN && block != Blocks.ENDER_CHEST) {
+                        if (block != Blocks.ANVIL) {
                             isSafe = false;
                         }
                     }
@@ -186,8 +186,8 @@ public class HoleManager extends Feature implements Runnable
     public boolean isSafe(final BlockPos pos) {
         boolean isSafe = true;
         for (final BlockPos offset : HoleManager.surroundOffset) {
-            final Block block = HoleManager.mc.field_71441_e.func_180495_p(pos.func_177971_a((Vec3i)offset)).func_177230_c();
-            if (block != Blocks.field_150357_h) {
+            final Block block = HoleManager.mc.world.getBlockState(pos.add((Vec3i)offset)).getBlock();
+            if (block != Blocks.BEDROCK) {
                 isSafe = false;
                 break;
             }

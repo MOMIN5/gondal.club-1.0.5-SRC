@@ -81,10 +81,10 @@ public class CrystalChams extends Module
             return;
         }
         final Color color = this.colorSync.getValue() ? Colors.INSTANCE.getCurrentColor() : EntityUtil.getColor(event.entity, this.red.getValue(), this.green.getValue(), this.blue.getValue(), this.alpha.getValue(), false);
-        final boolean fancyGraphics = CrystalChams.mc.field_71474_y.field_74347_j;
-        CrystalChams.mc.field_71474_y.field_74347_j = false;
-        final float gamma = CrystalChams.mc.field_71474_y.field_74333_Y;
-        CrystalChams.mc.field_71474_y.field_74333_Y = 10000.0f;
+        final boolean fancyGraphics = CrystalChams.mc.gameSettings.fancyGraphics;
+        CrystalChams.mc.gameSettings.fancyGraphics = false;
+        final float gamma = CrystalChams.mc.gameSettings.gammaSetting;
+        CrystalChams.mc.gameSettings.gammaSetting = 10000.0f;
         GL11.glPushMatrix();
         GL11.glPushAttrib(1048575);
         GL11.glPolygonMode(1032, 6913);
@@ -95,10 +95,10 @@ public class CrystalChams extends Module
         }
         GL11.glEnable(2848);
         GL11.glEnable(3042);
-        GlStateManager.func_179112_b(770, 771);
-        GlStateManager.func_179131_c(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, color.getAlpha() / 255.0f);
-        GlStateManager.func_187441_d((float)this.lineWidth.getValue());
-        event.modelBase.func_78088_a(event.entity, event.limbSwing, event.limbSwingAmount, event.age, event.headYaw, event.headPitch, event.scale);
+        GlStateManager.blendFunc(770, 771);
+        GlStateManager.color(color.getRed() / 255.0f, color.getGreen() / 255.0f, color.getBlue() / 255.0f, color.getAlpha() / 255.0f);
+        GlStateManager.glLineWidth((float)this.lineWidth.getValue());
+        event.modelBase.render(event.entity, event.limbSwing, event.limbSwingAmount, event.age, event.headYaw, event.headPitch, event.scale);
         GL11.glPopAttrib();
         GL11.glPopMatrix();
     }

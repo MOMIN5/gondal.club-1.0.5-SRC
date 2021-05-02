@@ -50,7 +50,7 @@ public class PlayerUtil implements Util
     UUID playerUUID;
     
     public PlayerUtil() {
-        this.playerUUID = getUUIDFromName(PlayerUtil.mc.field_71439_g.func_70005_c_());
+        this.playerUUID = getUUIDFromName(PlayerUtil.mc.player.getName());
     }
     
     public static String getNameFromUUID(final UUID uuid) {
@@ -181,7 +181,7 @@ public class PlayerUtil implements Util
             connection.setRequestProperty("Content-Type", "application/json");
             if (element != null) {
                 final DataOutputStream output = new DataOutputStream(connection.getOutputStream());
-                output.writeBytes(AdvancementManager.field_192783_b.toJson(element));
+                output.writeBytes(AdvancementManager.GSON.toJson(element));
                 output.close();
             }
             final Scanner scanner = new Scanner(connection.getInputStream());
@@ -221,10 +221,10 @@ public class PlayerUtil implements Util
         public void run() {
             NetworkPlayerInfo profile;
             try {
-                final ArrayList<NetworkPlayerInfo> infoMap = new ArrayList<NetworkPlayerInfo>(Objects.requireNonNull(Util.mc.func_147114_u()).func_175106_d());
-                profile = infoMap.stream().filter(networkPlayerInfo -> networkPlayerInfo.func_178845_a().getName().equalsIgnoreCase(this.name)).findFirst().orElse(null);
+                final ArrayList<NetworkPlayerInfo> infoMap = new ArrayList<NetworkPlayerInfo>(Objects.requireNonNull(Util.mc.getConnection()).getPlayerInfoMap());
+                profile = infoMap.stream().filter(networkPlayerInfo -> networkPlayerInfo.getGameProfile().getName().equalsIgnoreCase(this.name)).findFirst().orElse(null);
                 assert profile != null;
-                this.uuid = profile.func_178845_a().getId();
+                this.uuid = profile.getGameProfile().getId();
             }
             catch (Exception e2) {
                 profile = null;
@@ -286,8 +286,8 @@ public class PlayerUtil implements Util
         
         public String lookUpName() {
             EntityPlayer player = null;
-            if (Util.mc.field_71441_e != null) {
-                player = Util.mc.field_71441_e.func_152378_a(this.uuidID);
+            if (Util.mc.world != null) {
+                player = Util.mc.world.getPlayerEntityByUUID(this.uuidID);
             }
             if (player == null) {
                 final String url = "https://api.mojang.com/user/profiles/" + this.uuid.replace("-", "") + "/names";
@@ -305,7 +305,7 @@ public class PlayerUtil implements Util
                     return null;
                 }
             }
-            return player.func_70005_c_();
+            return player.getName();
         }
         
         public String getName() {

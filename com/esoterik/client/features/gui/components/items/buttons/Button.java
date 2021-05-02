@@ -40,7 +40,7 @@ public class Button extends Item
     public void onMouseClick() {
         this.state = !this.state;
         this.toggle();
-        Button.mc.func_147118_V().func_147682_a((ISound)PositionedSoundRecord.func_184371_a(SoundEvents.field_187909_gi, 1.0f));
+        Button.mc.getSoundHandler().playSound((ISound)PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0f));
     }
     
     public void toggle() {

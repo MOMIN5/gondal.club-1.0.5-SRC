@@ -72,19 +72,19 @@ public class Notifications extends Module
     @Override
     public void onUpdate() {
         if (this.visualRange.getValue()) {
-            final List<EntityPlayer> tickPlayerList = new ArrayList<EntityPlayer>(Notifications.mc.field_71441_e.field_73010_i);
+            final List<EntityPlayer> tickPlayerList = new ArrayList<EntityPlayer>(Notifications.mc.world.playerEntities);
             if (tickPlayerList.size() > 0) {
                 for (final EntityPlayer player : tickPlayerList) {
-                    if (player.func_70005_c_().equals(Notifications.mc.field_71439_g.func_70005_c_())) {
+                    if (player.getName().equals(Notifications.mc.player.getName())) {
                         continue;
                     }
                     if (!this.knownPlayers.contains(player)) {
                         this.knownPlayers.add(player);
                         if (esohack.friendManager.isFriend(player)) {
-                            Command.sendMessage("Player §a" + player.func_70005_c_() + "§r" + " entered your visual range" + (this.coords.getValue() ? (" at (" + (int)player.field_70165_t + ", " + (int)player.field_70163_u + ", " + (int)player.field_70161_v + ")!") : "!"), true);
+                            Command.sendMessage("Player §a" + player.getName() + "§r" + " entered your visual range" + (this.coords.getValue() ? (" at (" + (int)player.posX + ", " + (int)player.posY + ", " + (int)player.posZ + ")!") : "!"), true);
                         }
                         else {
-                            Command.sendMessage("Player §c" + player.func_70005_c_() + "§r" + " entered your visual range" + (this.coords.getValue() ? (" at (" + (int)player.field_70165_t + ", " + (int)player.field_70163_u + ", " + (int)player.field_70161_v + ")!") : "!"), true);
+                            Command.sendMessage("Player §c" + player.getName() + "§r" + " entered your visual range" + (this.coords.getValue() ? (" at (" + (int)player.posX + ", " + (int)player.posY + ", " + (int)player.posZ + ")!") : "!"), true);
                         }
                         return;
                     }
@@ -96,10 +96,10 @@ public class Notifications extends Module
                         this.knownPlayers.remove(player);
                         if (this.leaving.getValue()) {
                             if (esohack.friendManager.isFriend(player)) {
-                                Command.sendMessage("Player §a" + player.func_70005_c_() + "§r" + " left your visual range" + (this.coords.getValue() ? (" at (" + (int)player.field_70165_t + ", " + (int)player.field_70163_u + ", " + (int)player.field_70161_v + ")!") : "!"), true);
+                                Command.sendMessage("Player §a" + player.getName() + "§r" + " left your visual range" + (this.coords.getValue() ? (" at (" + (int)player.posX + ", " + (int)player.posY + ", " + (int)player.posZ + ")!") : "!"), true);
                             }
                             else {
-                                Command.sendMessage("Player §c" + player.func_70005_c_() + "§r" + " left your visual range" + (this.coords.getValue() ? (" at (" + (int)player.field_70165_t + ", " + (int)player.field_70163_u + ", " + (int)player.field_70161_v + ")!") : "!"), true);
+                                Command.sendMessage("Player §c" + player.getName() + "§r" + " left your visual range" + (this.coords.getValue() ? (" at (" + (int)player.posX + ", " + (int)player.posY + ", " + (int)player.posZ + ")!") : "!"), true);
                             }
                         }
                     }
