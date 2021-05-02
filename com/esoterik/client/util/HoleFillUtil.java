@@ -31,17 +31,17 @@ public class HoleFillUtil
     public static FMLCommonHandler fmlHandler;
     
     public static void placeBlockScaffold(final BlockPos pos) {
-        final Vec3d eyesPos = new Vec3d(HoleFillUtil.player.field_70165_t, HoleFillUtil.player.field_70163_u + HoleFillUtil.player.func_70047_e(), HoleFillUtil.player.field_70161_v);
+        final Vec3d eyesPos = new Vec3d(HoleFillUtil.player.posX, HoleFillUtil.player.posY + HoleFillUtil.player.getEyeHeight(), HoleFillUtil.player.posZ);
         for (final EnumFacing side : EnumFacing.values()) {
-            final BlockPos neighbor = pos.func_177972_a(side);
-            final EnumFacing side2 = side.func_176734_d();
+            final BlockPos neighbor = pos.offset(side);
+            final EnumFacing side2 = side.getOpposite();
             if (canBeClicked(neighbor)) {
-                final Vec3d hitVec = new Vec3d((Vec3i)neighbor).func_72441_c(0.5, 0.5, 0.5).func_178787_e(new Vec3d(side2.func_176730_m()).func_186678_a(0.5));
-                if (eyesPos.func_72436_e(hitVec) <= 18.0625) {
+                final Vec3d hitVec = new Vec3d((Vec3i)neighbor).add(0.5, 0.5, 0.5).add(new Vec3d(side2.getDirectionVec()).scale(0.5));
+                if (eyesPos.squareDistanceTo(hitVec) <= 18.0625) {
                     faceVectorPacketInstant(hitVec);
                     processRightClickBlock(neighbor, side2, hitVec);
-                    HoleFillUtil.mc.field_71439_g.func_184609_a(EnumHand.MAIN_HAND);
-                    HoleFillUtil.mc.field_71467_ac = 4;
+                    HoleFillUtil.mc.player.swingArm(EnumHand.MAIN_HAND);
+                    HoleFillUtil.mc.rightClickDelayTimer = 4;
                     return;
                 }
             }
@@ -50,48 +50,48 @@ public class HoleFillUtil
     
     private static float[] getLegitRotations(final Vec3d vec) {
         final Vec3d eyesPos = getEyesPos();
-        final double diffX = vec.field_72450_a - eyesPos.field_72450_a;
-        final double diffY = vec.field_72448_b - eyesPos.field_72448_b;
-        final double diffZ = vec.field_72449_c - eyesPos.field_72449_c;
+        final double diffX = vec.x - eyesPos.x;
+        final double diffY = vec.y - eyesPos.y;
+        final double diffZ = vec.z - eyesPos.z;
         final double diffXZ = Math.sqrt(diffX * diffX + diffZ * diffZ);
         final float yaw = (float)Math.toDegrees(Math.atan2(diffZ, diffX)) - 90.0f;
         final float pitch = (float)(-Math.toDegrees(Math.atan2(diffY, diffXZ)));
-        return new float[] { HoleFillUtil.mc.field_71439_g.field_70177_z + MathHelper.func_76142_g(yaw - HoleFillUtil.mc.field_71439_g.field_70177_z), HoleFillUtil.mc.field_71439_g.field_70125_A + MathHelper.func_76142_g(pitch - HoleFillUtil.mc.field_71439_g.field_70125_A) };
+        return new float[] { HoleFillUtil.mc.player.rotationYaw + MathHelper.wrapDegrees(yaw - HoleFillUtil.mc.player.rotationYaw), HoleFillUtil.mc.player.rotationPitch + MathHelper.wrapDegrees(pitch - HoleFillUtil.mc.player.rotationPitch) };
     }
     
     private static Vec3d getEyesPos() {
-        return new Vec3d(HoleFillUtil.mc.field_71439_g.field_70165_t, HoleFillUtil.mc.field_71439_g.field_70163_u + HoleFillUtil.mc.field_71439_g.func_70047_e(), HoleFillUtil.mc.field_71439_g.field_70161_v);
+        return new Vec3d(HoleFillUtil.mc.player.posX, HoleFillUtil.mc.player.posY + HoleFillUtil.mc.player.getEyeHeight(), HoleFillUtil.mc.player.posZ);
     }
     
     public static void faceVectorPacketInstant(final Vec3d vec) {
         final float[] rotations = getLegitRotations(vec);
-        HoleFillUtil.mc.field_71439_g.field_71174_a.func_147297_a((Packet)new CPacketPlayer.Rotation(rotations[0], rotations[1], HoleFillUtil.mc.field_71439_g.field_70122_E));
+        HoleFillUtil.mc.player.connection.sendPacket((Packet)new CPacketPlayer.Rotation(rotations[0], rotations[1], HoleFillUtil.mc.player.onGround));
     }
     
     private static void processRightClickBlock(final BlockPos pos, final EnumFacing side, final Vec3d hitVec) {
-        getPlayerController().func_187099_a(HoleFillUtil.mc.field_71439_g, HoleFillUtil.mc.field_71441_e, pos, side, hitVec, EnumHand.MAIN_HAND);
+        getPlayerController().processRightClickBlock(HoleFillUtil.mc.player, HoleFillUtil.mc.world, pos, side, hitVec, EnumHand.MAIN_HAND);
     }
     
     public static boolean canBeClicked(final BlockPos pos) {
-        return getBlock(pos).func_176209_a(getState(pos), false);
+        return getBlock(pos).canCollideCheck(getState(pos), false);
     }
     
     private static Block getBlock(final BlockPos pos) {
-        return getState(pos).func_177230_c();
+        return getState(pos).getBlock();
     }
     
     private static PlayerControllerMP getPlayerController() {
-        return Minecraft.func_71410_x().field_71442_b;
+        return Minecraft.getMinecraft().playerController;
     }
     
     private static IBlockState getState(final BlockPos pos) {
-        return HoleFillUtil.mc.field_71441_e.func_180495_p(pos);
+        return HoleFillUtil.mc.world.getBlockState(pos);
     }
     
     public static boolean checkForNeighbours(final BlockPos blockPos) {
         if (!hasNeighbour(blockPos)) {
             for (final EnumFacing side : EnumFacing.values()) {
-                final BlockPos neighbour = blockPos.func_177972_a(side);
+                final BlockPos neighbour = blockPos.offset(side);
                 if (hasNeighbour(neighbour)) {
                     return true;
                 }
@@ -103,10 +103,10 @@ public class HoleFillUtil
     
     public static EnumFacing getPlaceableSide(final BlockPos pos) {
         for (final EnumFacing side : EnumFacing.values()) {
-            final BlockPos neighbour = pos.func_177972_a(side);
-            if (HoleFillUtil.mc.field_71441_e.func_180495_p(neighbour).func_177230_c().func_176209_a(HoleFillUtil.mc.field_71441_e.func_180495_p(neighbour), false)) {
-                final IBlockState blockState = HoleFillUtil.mc.field_71441_e.func_180495_p(neighbour);
-                if (!blockState.func_185904_a().func_76222_j()) {
+            final BlockPos neighbour = pos.offset(side);
+            if (HoleFillUtil.mc.world.getBlockState(neighbour).getBlock().canCollideCheck(HoleFillUtil.mc.world.getBlockState(neighbour), false)) {
+                final IBlockState blockState = HoleFillUtil.mc.world.getBlockState(neighbour);
+                if (!blockState.getMaterial().isReplaceable()) {
                     return side;
                 }
             }
@@ -116,8 +116,8 @@ public class HoleFillUtil
     
     public static boolean hasNeighbour(final BlockPos blockPos) {
         for (final EnumFacing side : EnumFacing.values()) {
-            final BlockPos neighbour = blockPos.func_177972_a(side);
-            if (!HoleFillUtil.mc.field_71441_e.func_180495_p(neighbour).func_185904_a().func_76222_j()) {
+            final BlockPos neighbour = blockPos.offset(side);
+            if (!HoleFillUtil.mc.world.getBlockState(neighbour).getMaterial().isReplaceable()) {
                 return true;
             }
         }
@@ -125,10 +125,10 @@ public class HoleFillUtil
     }
     
     static {
-        blackList = Arrays.asList(Blocks.field_150477_bB, (Block)Blocks.field_150486_ae, Blocks.field_150447_bR, Blocks.field_150462_ai, Blocks.field_150467_bQ, Blocks.field_150382_bo, (Block)Blocks.field_150438_bZ, Blocks.field_150409_cd, Blocks.field_150367_z, Blocks.field_150415_aT, Blocks.field_150381_bn);
-        shulkerList = Arrays.asList(Blocks.field_190977_dl, Blocks.field_190978_dm, Blocks.field_190979_dn, Blocks.field_190980_do, Blocks.field_190981_dp, Blocks.field_190982_dq, Blocks.field_190983_dr, Blocks.field_190984_ds, Blocks.field_190985_dt, Blocks.field_190986_du, Blocks.field_190987_dv, Blocks.field_190988_dw, Blocks.field_190989_dx, Blocks.field_190990_dy, Blocks.field_190991_dz, Blocks.field_190975_dA);
-        mc = Minecraft.func_71410_x();
-        HoleFillUtil.player = (Entity)HoleFillUtil.mc.field_71439_g;
+        blackList = Arrays.asList(Blocks.ENDER_CHEST, (Block)Blocks.CHEST, Blocks.TRAPPED_CHEST, Blocks.CRAFTING_TABLE, Blocks.ANVIL, Blocks.BREWING_STAND, (Block)Blocks.HOPPER, Blocks.DROPPER, Blocks.DISPENSER, Blocks.TRAPDOOR, Blocks.ENCHANTING_TABLE);
+        shulkerList = Arrays.asList(Blocks.WHITE_SHULKER_BOX, Blocks.ORANGE_SHULKER_BOX, Blocks.MAGENTA_SHULKER_BOX, Blocks.LIGHT_BLUE_SHULKER_BOX, Blocks.YELLOW_SHULKER_BOX, Blocks.LIME_SHULKER_BOX, Blocks.PINK_SHULKER_BOX, Blocks.GRAY_SHULKER_BOX, Blocks.SILVER_SHULKER_BOX, Blocks.CYAN_SHULKER_BOX, Blocks.PURPLE_SHULKER_BOX, Blocks.BLUE_SHULKER_BOX, Blocks.BROWN_SHULKER_BOX, Blocks.GREEN_SHULKER_BOX, Blocks.RED_SHULKER_BOX, Blocks.BLACK_SHULKER_BOX);
+        mc = Minecraft.getMinecraft();
+        HoleFillUtil.player = (Entity)HoleFillUtil.mc.player;
         HoleFillUtil.fmlHandler = FMLCommonHandler.instance();
     }
 }

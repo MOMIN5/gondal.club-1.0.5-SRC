@@ -62,29 +62,29 @@ public class Velocity extends Module
     
     @SubscribeEvent
     public void onPacketReceived(final PacketEvent.Receive event) {
-        if (event.getStage() == 0 && Velocity.mc.field_71439_g != null) {
+        if (event.getStage() == 0 && Velocity.mc.player != null) {
             if (event.getPacket() instanceof SPacketEntityVelocity) {
                 final SPacketEntityVelocity velocity = event.getPacket();
-                if (velocity.func_149412_c() == Velocity.mc.field_71439_g.field_145783_c) {
+                if (velocity.getEntityID() == Velocity.mc.player.entityId) {
                     if (this.horizontal.getValue() == 0.0f && this.vertical.getValue() == 0.0f) {
                         event.setCanceled(true);
                         return;
                     }
                     final SPacketEntityVelocity sPacketEntityVelocity = velocity;
-                    sPacketEntityVelocity.field_149415_b *= (int)(Object)this.horizontal.getValue();
+                    sPacketEntityVelocity.motionX *= (int)(Object)this.horizontal.getValue();
                     final SPacketEntityVelocity sPacketEntityVelocity2 = velocity;
-                    sPacketEntityVelocity2.field_149416_c *= (int)(Object)this.vertical.getValue();
+                    sPacketEntityVelocity2.motionY *= (int)(Object)this.vertical.getValue();
                     final SPacketEntityVelocity sPacketEntityVelocity3 = velocity;
-                    sPacketEntityVelocity3.field_149414_d *= (int)(Object)this.horizontal.getValue();
+                    sPacketEntityVelocity3.motionZ *= (int)(Object)this.horizontal.getValue();
                 }
             }
             if (event.getPacket() instanceof SPacketEntityStatus && this.bobbers.getValue()) {
                 final SPacketEntityStatus packet = event.getPacket();
-                if (packet.func_149160_c() == 31) {
-                    final Entity entity = packet.func_149161_a((World)Velocity.mc.field_71441_e);
+                if (packet.getOpCode() == 31) {
+                    final Entity entity = packet.getEntity((World)Velocity.mc.world);
                     if (entity instanceof EntityFishHook) {
                         final EntityFishHook fishHook = (EntityFishHook)entity;
-                        if (fishHook.field_146043_c == Velocity.mc.field_71439_g) {
+                        if (fishHook.caughtEntity == Velocity.mc.player) {
                             event.setCanceled(true);
                         }
                     }
@@ -97,18 +97,18 @@ public class Velocity extends Module
                 }
                 final SPacketExplosion sPacketExplosion;
                 final SPacketExplosion velocity2 = sPacketExplosion = event.getPacket();
-                sPacketExplosion.field_149152_f *= this.horizontal.getValue();
+                sPacketExplosion.motionX *= this.horizontal.getValue();
                 final SPacketExplosion sPacketExplosion2 = velocity2;
-                sPacketExplosion2.field_149153_g *= this.vertical.getValue();
+                sPacketExplosion2.motionY *= this.vertical.getValue();
                 final SPacketExplosion sPacketExplosion3 = velocity2;
-                sPacketExplosion3.field_149159_h *= this.horizontal.getValue();
+                sPacketExplosion3.motionZ *= this.horizontal.getValue();
             }
         }
     }
     
     @SubscribeEvent
     public void onPush(final PushEvent event) {
-        if (event.getStage() == 0 && this.noPush.getValue() && event.entity.equals((Object)Velocity.mc.field_71439_g)) {
+        if (event.getStage() == 0 && this.noPush.getValue() && event.entity.equals((Object)Velocity.mc.player)) {
             if (this.horizontal.getValue() == 0.0f && this.vertical.getValue() == 0.0f) {
                 event.setCanceled(true);
                 return;
@@ -120,7 +120,7 @@ public class Velocity extends Module
         else if (event.getStage() == 1 && this.blocks.getValue()) {
             event.setCanceled(true);
         }
-        else if (event.getStage() == 2 && this.water.getValue() && Velocity.mc.field_71439_g != null && Velocity.mc.field_71439_g.equals((Object)event.entity)) {
+        else if (event.getStage() == 2 && this.water.getValue() && Velocity.mc.player != null && Velocity.mc.player.equals((Object)event.entity)) {
             event.setCanceled(true);
         }
     }

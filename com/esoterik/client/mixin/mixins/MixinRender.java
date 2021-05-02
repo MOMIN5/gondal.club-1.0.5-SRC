@@ -17,7 +17,7 @@ public class MixinRender<T extends Entity>
 {
     @Inject(method = { "shouldRender" }, at = { @At("HEAD") }, cancellable = true)
     public void shouldRender(final T livingEntity, final ICamera camera, final double camX, final double camY, final double camZ, final CallbackInfoReturnable<Boolean> info) {
-        if (livingEntity == null || camera == null || livingEntity.func_184177_bl() == null) {
+        if (livingEntity == null || camera == null || livingEntity.getRenderBoundingBox() == null) {
             info.setReturnValue(false);
         }
     }

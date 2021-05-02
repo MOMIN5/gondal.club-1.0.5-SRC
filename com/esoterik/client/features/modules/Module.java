@@ -175,7 +175,7 @@ public class Module extends Feature
     }
     
     public Vec3d process(final Entity entity, final double x, final double y, final double z) {
-        return new Vec3d((entity.field_70165_t - entity.field_70142_S) * x, (entity.field_70163_u - entity.field_70137_T) * y, (entity.field_70161_v - entity.field_70136_U) * z);
+        return new Vec3d((entity.posX - entity.lastTickPosX) * x, (entity.posY - entity.lastTickPosY) * y, (entity.posZ - entity.lastTickPosZ) * z);
     }
     
     public String getFullArrayString() {

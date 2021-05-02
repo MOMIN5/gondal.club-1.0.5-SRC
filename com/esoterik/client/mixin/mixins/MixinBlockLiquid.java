@@ -38,6 +38,6 @@ public class MixinBlockLiquid extends Block
     
     @Inject(method = { "canCollideCheck" }, at = { @At("HEAD") }, cancellable = true)
     public void canCollideCheckHook(final IBlockState blockState, final boolean hitIfLiquid, final CallbackInfoReturnable<Boolean> info) {
-        info.setReturnValue(hitIfLiquid && (int)blockState.func_177229_b((IProperty)BlockLiquid.field_176367_b) == 0);
+        info.setReturnValue(hitIfLiquid && (int)blockState.getValue((IProperty)BlockLiquid.LEVEL) == 0);
     }
 }

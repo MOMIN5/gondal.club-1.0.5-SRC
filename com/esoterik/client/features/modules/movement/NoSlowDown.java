@@ -49,15 +49,15 @@ public class NoSlowDown extends Module
     @Override
     public void onUpdate() {
         if (this.guiMove.getValue()) {
-            if (NoSlowDown.mc.field_71462_r instanceof GuiOptions || NoSlowDown.mc.field_71462_r instanceof GuiVideoSettings || NoSlowDown.mc.field_71462_r instanceof GuiScreenOptionsSounds || NoSlowDown.mc.field_71462_r instanceof GuiContainer || NoSlowDown.mc.field_71462_r instanceof GuiIngameMenu) {
+            if (NoSlowDown.mc.currentScreen instanceof GuiOptions || NoSlowDown.mc.currentScreen instanceof GuiVideoSettings || NoSlowDown.mc.currentScreen instanceof GuiScreenOptionsSounds || NoSlowDown.mc.currentScreen instanceof GuiContainer || NoSlowDown.mc.currentScreen instanceof GuiIngameMenu) {
                 for (final KeyBinding bind : NoSlowDown.keys) {
-                    KeyBinding.func_74510_a(bind.func_151463_i(), Keyboard.isKeyDown(bind.func_151463_i()));
+                    KeyBinding.setKeyBindState(bind.getKeyCode(), Keyboard.isKeyDown(bind.getKeyCode()));
                 }
             }
-            else if (NoSlowDown.mc.field_71462_r == null) {
+            else if (NoSlowDown.mc.currentScreen == null) {
                 for (final KeyBinding bind : NoSlowDown.keys) {
-                    if (!Keyboard.isKeyDown(bind.func_151463_i())) {
-                        KeyBinding.func_74510_a(bind.func_151463_i(), false);
+                    if (!Keyboard.isKeyDown(bind.getKeyCode())) {
+                        KeyBinding.setKeyBindState(bind.getKeyCode(), false);
                     }
                 }
             }
@@ -66,23 +66,23 @@ public class NoSlowDown extends Module
     
     @SubscribeEvent
     public void onInput(final InputUpdateEvent event) {
-        if (this.noSlow.getValue() && NoSlowDown.mc.field_71439_g.func_184587_cr() && !NoSlowDown.mc.field_71439_g.func_184218_aH()) {
+        if (this.noSlow.getValue() && NoSlowDown.mc.player.isHandActive() && !NoSlowDown.mc.player.isRiding()) {
             final MovementInput movementInput = event.getMovementInput();
-            movementInput.field_78902_a *= 5.0f;
+            movementInput.moveStrafe *= 5.0f;
             final MovementInput movementInput2 = event.getMovementInput();
-            movementInput2.field_192832_b *= 5.0f;
+            movementInput2.moveForward *= 5.0f;
         }
     }
     
     @SubscribeEvent
     public void onKeyEvent(final KeyEvent event) {
-        if (this.guiMove.getValue() && event.getStage() == 0 && !(NoSlowDown.mc.field_71462_r instanceof GuiChat)) {
+        if (this.guiMove.getValue() && event.getStage() == 0 && !(NoSlowDown.mc.currentScreen instanceof GuiChat)) {
             event.info = event.pressed;
         }
     }
     
     static {
         NoSlowDown.INSTANCE = new NoSlowDown();
-        NoSlowDown.keys = new KeyBinding[] { NoSlowDown.mc.field_71474_y.field_74351_w, NoSlowDown.mc.field_71474_y.field_74368_y, NoSlowDown.mc.field_71474_y.field_74370_x, NoSlowDown.mc.field_71474_y.field_74366_z, NoSlowDown.mc.field_71474_y.field_74314_A, NoSlowDown.mc.field_71474_y.field_151444_V };
+        NoSlowDown.keys = new KeyBinding[] { NoSlowDown.mc.gameSettings.keyBindForward, NoSlowDown.mc.gameSettings.keyBindBack, NoSlowDown.mc.gameSettings.keyBindLeft, NoSlowDown.mc.gameSettings.keyBindRight, NoSlowDown.mc.gameSettings.keyBindJump, NoSlowDown.mc.gameSettings.keyBindSprint };
     }
 }

@@ -139,7 +139,7 @@ public class HoleESP extends Module
             if (drawnHoles >= this.holes.getValue()) {
                 break;
             }
-            if (pos.equals((Object)new BlockPos(HoleESP.mc.field_71439_g.field_70165_t, HoleESP.mc.field_71439_g.field_70163_u, HoleESP.mc.field_71439_g.field_70161_v)) && !this.ownHole.getValue()) {
+            if (pos.equals((Object)new BlockPos(HoleESP.mc.player.posX, HoleESP.mc.player.posY, HoleESP.mc.player.posZ)) && !this.ownHole.getValue()) {
                 continue;
             }
             if (!RotationUtil.isInFov(pos)) {

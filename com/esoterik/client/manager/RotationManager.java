@@ -17,34 +17,34 @@ public class RotationManager extends Feature
     private float pitch;
     
     public void updateRotations() {
-        this.yaw = RotationManager.mc.field_71439_g.field_70177_z;
-        this.pitch = RotationManager.mc.field_71439_g.field_70125_A;
+        this.yaw = RotationManager.mc.player.rotationYaw;
+        this.pitch = RotationManager.mc.player.rotationPitch;
     }
     
     public void restoreRotations() {
-        RotationManager.mc.field_71439_g.field_70177_z = this.yaw;
-        RotationManager.mc.field_71439_g.field_70759_as = this.yaw;
-        RotationManager.mc.field_71439_g.field_70125_A = this.pitch;
+        RotationManager.mc.player.rotationYaw = this.yaw;
+        RotationManager.mc.player.rotationYawHead = this.yaw;
+        RotationManager.mc.player.rotationPitch = this.pitch;
     }
     
     public void setPlayerRotations(final float yaw, final float pitch) {
-        RotationManager.mc.field_71439_g.field_70177_z = yaw;
-        RotationManager.mc.field_71439_g.field_70759_as = yaw;
-        RotationManager.mc.field_71439_g.field_70125_A = pitch;
+        RotationManager.mc.player.rotationYaw = yaw;
+        RotationManager.mc.player.rotationYawHead = yaw;
+        RotationManager.mc.player.rotationPitch = pitch;
     }
     
     public void setPlayerYaw(final float yaw) {
-        RotationManager.mc.field_71439_g.field_70177_z = yaw;
-        RotationManager.mc.field_71439_g.field_70759_as = yaw;
+        RotationManager.mc.player.rotationYaw = yaw;
+        RotationManager.mc.player.rotationYawHead = yaw;
     }
     
     public void lookAtPos(final BlockPos pos) {
-        final float[] angle = MathUtil.calcAngle(RotationManager.mc.field_71439_g.func_174824_e(RotationManager.mc.func_184121_ak()), new Vec3d((double)(pos.func_177958_n() + 0.5f), (double)(pos.func_177956_o() + 0.5f), (double)(pos.func_177952_p() + 0.5f)));
+        final float[] angle = MathUtil.calcAngle(RotationManager.mc.player.getPositionEyes(RotationManager.mc.getRenderPartialTicks()), new Vec3d((double)(pos.getX() + 0.5f), (double)(pos.getY() + 0.5f), (double)(pos.getZ() + 0.5f)));
         this.setPlayerRotations(angle[0], angle[1]);
     }
     
     public void lookAtVec3d(final Vec3d vec3d) {
-        final float[] angle = MathUtil.calcAngle(RotationManager.mc.field_71439_g.func_174824_e(RotationManager.mc.func_184121_ak()), new Vec3d(vec3d.field_72450_a, vec3d.field_72448_b, vec3d.field_72449_c));
+        final float[] angle = MathUtil.calcAngle(RotationManager.mc.player.getPositionEyes(RotationManager.mc.getRenderPartialTicks()), new Vec3d(vec3d.x, vec3d.y, vec3d.z));
         this.setPlayerRotations(angle[0], angle[1]);
     }
     
@@ -54,12 +54,12 @@ public class RotationManager extends Feature
     }
     
     public void lookAtEntity(final Entity entity) {
-        final float[] angle = MathUtil.calcAngle(RotationManager.mc.field_71439_g.func_174824_e(RotationManager.mc.func_184121_ak()), entity.func_174824_e(RotationManager.mc.func_184121_ak()));
+        final float[] angle = MathUtil.calcAngle(RotationManager.mc.player.getPositionEyes(RotationManager.mc.getRenderPartialTicks()), entity.getPositionEyes(RotationManager.mc.getRenderPartialTicks()));
         this.setPlayerRotations(angle[0], angle[1]);
     }
     
     public void setPlayerPitch(final float pitch) {
-        RotationManager.mc.field_71439_g.field_70125_A = pitch;
+        RotationManager.mc.player.rotationPitch = pitch;
     }
     
     public float getYaw() {

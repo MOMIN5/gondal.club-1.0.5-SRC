@@ -89,7 +89,7 @@ public class Speedmine extends Module
     
     @Override
     public void onTick() {
-        if (this.currentPos != null && (!Speedmine.mc.field_71441_e.func_180495_p(this.currentPos).equals(this.currentBlockState) || Speedmine.mc.field_71441_e.func_180495_p(this.currentPos).func_177230_c() == Blocks.field_150350_a)) {
+        if (this.currentPos != null && (!Speedmine.mc.world.getBlockState(this.currentPos).equals(this.currentBlockState) || Speedmine.mc.world.getBlockState(this.currentPos).getBlock() == Blocks.AIR)) {
             this.currentPos = null;
             this.currentBlockState = null;
         }
@@ -101,13 +101,13 @@ public class Speedmine extends Module
             return;
         }
         if (this.noDelay.getValue()) {
-            Speedmine.mc.field_71442_b.field_78781_i = 0;
+            Speedmine.mc.playerController.blockHitDelay = 0;
         }
         if (this.isMining && this.lastPos != null && this.lastFacing != null && this.noBreakAnim.getValue()) {
-            Speedmine.mc.field_71439_g.field_71174_a.func_147297_a((Packet)new CPacketPlayerDigging(CPacketPlayerDigging.Action.ABORT_DESTROY_BLOCK, this.lastPos, this.lastFacing));
+            Speedmine.mc.player.connection.sendPacket((Packet)new CPacketPlayerDigging(CPacketPlayerDigging.Action.ABORT_DESTROY_BLOCK, this.lastPos, this.lastFacing));
         }
-        if (this.reset.getValue() && Speedmine.mc.field_71474_y.field_74313_G.func_151470_d() && !this.allow.getValue()) {
-            Speedmine.mc.field_71442_b.field_78778_j = false;
+        if (this.reset.getValue() && Speedmine.mc.gameSettings.keyBindUseItem.isKeyDown() && !this.allow.getValue()) {
+            Speedmine.mc.playerController.isHittingBlock = false;
         }
     }
     
@@ -131,9 +131,9 @@ public class Speedmine extends Module
             }
             if (this.noBreakAnim.getValue() && event.getPacket() instanceof CPacketPlayerDigging) {
                 final CPacketPlayerDigging packet = event.getPacket();
-                if (packet != null && packet.func_179715_a() != null) {
+                if (packet != null && packet.getPosition() != null) {
                     try {
-                        for (final Entity entity : Speedmine.mc.field_71441_e.func_72839_b((Entity)null, new AxisAlignedBB(packet.func_179715_a()))) {
+                        for (final Entity entity : Speedmine.mc.world.getEntitiesWithinAABBExcludingEntity((Entity)null, new AxisAlignedBB(packet.getPosition()))) {
                             if (entity instanceof EntityEnderCrystal) {
                                 this.showAnimation();
                                 return;
@@ -141,10 +141,10 @@ public class Speedmine extends Module
                         }
                     }
                     catch (Exception ex) {}
-                    if (packet.func_180762_c().equals((Object)CPacketPlayerDigging.Action.START_DESTROY_BLOCK)) {
-                        this.showAnimation(true, packet.func_179715_a(), packet.func_179714_b());
+                    if (packet.getAction().equals((Object)CPacketPlayerDigging.Action.START_DESTROY_BLOCK)) {
+                        this.showAnimation(true, packet.getPosition(), packet.getFacing());
                     }
-                    if (packet.func_180762_c().equals((Object)CPacketPlayerDigging.Action.STOP_DESTROY_BLOCK)) {
+                    if (packet.getAction().equals((Object)CPacketPlayerDigging.Action.STOP_DESTROY_BLOCK)) {
                         this.showAnimation();
                     }
                 }
@@ -157,32 +157,32 @@ public class Speedmine extends Module
         if (fullNullCheck()) {
             return;
         }
-        if (event.getStage() == 3 && this.reset.getValue() && Speedmine.mc.field_71442_b.field_78770_f > 0.1f) {
-            Speedmine.mc.field_71442_b.field_78778_j = true;
+        if (event.getStage() == 3 && this.reset.getValue() && Speedmine.mc.playerController.curBlockDamageMP > 0.1f) {
+            Speedmine.mc.playerController.isHittingBlock = true;
         }
         if (event.getStage() == 4 && this.tweaks.getValue()) {
             if (BlockUtil.canBreak(event.pos)) {
                 if (this.reset.getValue()) {
-                    Speedmine.mc.field_71442_b.field_78778_j = false;
+                    Speedmine.mc.playerController.isHittingBlock = false;
                 }
                 if (this.currentPos == null) {
                     this.currentPos = event.pos;
-                    this.currentBlockState = Speedmine.mc.field_71441_e.func_180495_p(this.currentPos);
+                    this.currentBlockState = Speedmine.mc.world.getBlockState(this.currentPos);
                     this.timer.reset();
                 }
-                Speedmine.mc.field_71439_g.func_184609_a(EnumHand.MAIN_HAND);
-                Speedmine.mc.field_71439_g.field_71174_a.func_147297_a((Packet)new CPacketPlayerDigging(CPacketPlayerDigging.Action.START_DESTROY_BLOCK, event.pos, event.facing));
-                Speedmine.mc.field_71439_g.field_71174_a.func_147297_a((Packet)new CPacketPlayerDigging(CPacketPlayerDigging.Action.STOP_DESTROY_BLOCK, event.pos, event.facing));
+                Speedmine.mc.player.swingArm(EnumHand.MAIN_HAND);
+                Speedmine.mc.player.connection.sendPacket((Packet)new CPacketPlayerDigging(CPacketPlayerDigging.Action.START_DESTROY_BLOCK, event.pos, event.facing));
+                Speedmine.mc.player.connection.sendPacket((Packet)new CPacketPlayerDigging(CPacketPlayerDigging.Action.STOP_DESTROY_BLOCK, event.pos, event.facing));
                 event.setCanceled(true);
             }
             if (this.doubleBreak.getValue()) {
-                final BlockPos above = event.pos.func_177982_a(0, 1, 0);
-                if (BlockUtil.canBreak(above) && Speedmine.mc.field_71439_g.func_70011_f((double)above.func_177958_n(), (double)above.func_177956_o(), (double)above.func_177952_p()) <= 5.0) {
-                    Speedmine.mc.field_71439_g.func_184609_a(EnumHand.MAIN_HAND);
-                    Speedmine.mc.field_71439_g.field_71174_a.func_147297_a((Packet)new CPacketPlayerDigging(CPacketPlayerDigging.Action.START_DESTROY_BLOCK, above, event.facing));
-                    Speedmine.mc.field_71439_g.field_71174_a.func_147297_a((Packet)new CPacketPlayerDigging(CPacketPlayerDigging.Action.STOP_DESTROY_BLOCK, above, event.facing));
-                    Speedmine.mc.field_71442_b.func_187103_a(above);
-                    Speedmine.mc.field_71441_e.func_175698_g(above);
+                final BlockPos above = event.pos.add(0, 1, 0);
+                if (BlockUtil.canBreak(above) && Speedmine.mc.player.getDistance((double)above.getX(), (double)above.getY(), (double)above.getZ()) <= 5.0) {
+                    Speedmine.mc.player.swingArm(EnumHand.MAIN_HAND);
+                    Speedmine.mc.player.connection.sendPacket((Packet)new CPacketPlayerDigging(CPacketPlayerDigging.Action.START_DESTROY_BLOCK, above, event.facing));
+                    Speedmine.mc.player.connection.sendPacket((Packet)new CPacketPlayerDigging(CPacketPlayerDigging.Action.STOP_DESTROY_BLOCK, above, event.facing));
+                    Speedmine.mc.playerController.onPlayerDestroyBlock(above);
+                    Speedmine.mc.world.setBlockToAir(above);
                 }
             }
         }

@@ -20,18 +20,18 @@ public class ReverseStep extends Module
     
     @Override
     public void onUpdate() {
-        if (Feature.fullNullCheck() || ReverseStep.mc.field_71439_g.func_70090_H() || ReverseStep.mc.field_71439_g.func_180799_ab() || ReverseStep.mc.field_71439_g.func_70617_f_()) {
+        if (Feature.fullNullCheck() || ReverseStep.mc.player.isInWater() || ReverseStep.mc.player.isInLava() || ReverseStep.mc.player.isOnLadder()) {
             return;
         }
-        if (ReverseStep.mc.field_71439_g.field_70122_E) {
-            final EntityPlayerSP field_71439_g = ReverseStep.mc.field_71439_g;
-            field_71439_g.field_70181_x -= this.speed.getValue() / 10.0f;
+        if (ReverseStep.mc.player.onGround) {
+            final EntityPlayerSP player = ReverseStep.mc.player;
+            player.motionY -= this.speed.getValue() / 10.0f;
         }
     }
     
     @Override
     public void onDisable() {
         super.onDisable();
-        ReverseStep.mc.field_71439_g.field_70181_x = 0.0;
+        ReverseStep.mc.player.motionY = 0.0;
     }
 }

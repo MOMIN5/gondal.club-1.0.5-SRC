@@ -33,11 +33,11 @@ public class Feature implements Util
     }
     
     public static boolean nullCheck() {
-        return Feature.mc.field_71439_g == null;
+        return Feature.mc.player == null;
     }
     
     public static boolean fullNullCheck() {
-        return Feature.mc.field_71439_g == null || Feature.mc.field_71441_e == null;
+        return Feature.mc.player == null || Feature.mc.world == null;
     }
     
     public String getName() {
@@ -63,7 +63,7 @@ public class Feature implements Util
     public Setting register(final Setting setting) {
         setting.setFeature(this);
         this.settings.add(setting);
-        if (this instanceof Module && Feature.mc.field_71462_r instanceof esohackGui) {
+        if (this instanceof Module && Feature.mc.currentScreen instanceof esohackGui) {
             esohackGui.getInstance().updateModule((Module)this);
         }
         return setting;
@@ -79,7 +79,7 @@ public class Feature implements Util
         if (!removeList.isEmpty()) {
             this.settings.removeAll(removeList);
         }
-        if (this instanceof Module && Feature.mc.field_71462_r instanceof esohackGui) {
+        if (this instanceof Module && Feature.mc.currentScreen instanceof esohackGui) {
             esohackGui.getInstance().updateModule((Module)this);
         }
     }

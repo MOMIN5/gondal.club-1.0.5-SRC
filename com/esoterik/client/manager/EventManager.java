@@ -59,7 +59,7 @@ public class EventManager extends Feature
     
     @SubscribeEvent
     public void onUpdate(final LivingEvent.LivingUpdateEvent event) {
-        if (!Feature.fullNullCheck() && event.getEntity().func_130014_f_().field_72995_K && event.getEntityLiving().equals((Object)EventManager.mc.field_71439_g)) {
+        if (!Feature.fullNullCheck() && event.getEntity().getEntityWorld().isRemote && event.getEntityLiving().equals((Object)EventManager.mc.player)) {
             esohack.potionManager.update();
             esohack.totemPopManager.onUpdate();
             esohack.inventoryManager.update();
@@ -96,9 +96,9 @@ public class EventManager extends Feature
             return;
         }
         esohack.moduleManager.onTick();
-        for (final EntityPlayer player : EventManager.mc.field_71441_e.field_73010_i) {
+        for (final EntityPlayer player : EventManager.mc.world.playerEntities) {
             if (player != null) {
-                if (player.func_110143_aJ() > 0.0f) {
+                if (player.getHealth() > 0.0f) {
                     continue;
                 }
                 MinecraftForge.EVENT_BUS.post((Event)new DeathEvent(player));
@@ -131,8 +131,8 @@ public class EventManager extends Feature
         esohack.serverManager.onPacketReceived();
         if (event.getPacket() instanceof SPacketEntityStatus) {
             final SPacketEntityStatus packet = event.getPacket();
-            if (packet.func_149160_c() == 35 && packet.func_149161_a((World)EventManager.mc.field_71441_e) instanceof EntityPlayer) {
-                final EntityPlayer player = (EntityPlayer)packet.func_149161_a((World)EventManager.mc.field_71441_e);
+            if (packet.getOpCode() == 35 && packet.getEntity((World)EventManager.mc.world) instanceof EntityPlayer) {
+                final EntityPlayer player = (EntityPlayer)packet.getEntity((World)EventManager.mc.world);
                 MinecraftForge.EVENT_BUS.post((Event)new TotemPopEvent(player));
                 esohack.totemPopManager.onTotemPop(player);
                 esohack.potionManager.onTotemPop(player);
@@ -140,7 +140,7 @@ public class EventManager extends Feature
         }
         if (event.getPacket() instanceof SPacketPlayerListItem && !Feature.fullNullCheck() && this.logoutTimer.passedS(1.0)) {
             final SPacketPlayerListItem packet2 = event.getPacket();
-            if (!SPacketPlayerListItem.Action.ADD_PLAYER.equals((Object)packet2.func_179768_b()) && !SPacketPlayerListItem.Action.REMOVE_PLAYER.equals((Object)packet2.func_179768_b())) {
+            if (!SPacketPlayerListItem.Action.ADD_PLAYER.equals((Object)packet2.getAction()) && !SPacketPlayerListItem.Action.REMOVE_PLAYER.equals((Object)packet2.getAction())) {
                 return;
             }
         }
@@ -154,29 +154,29 @@ public class EventManager extends Feature
         if (event.isCanceled()) {
             return;
         }
-        EventManager.mc.field_71424_I.func_76320_a("client");
-        GlStateManager.func_179090_x();
-        GlStateManager.func_179147_l();
-        GlStateManager.func_179118_c();
-        GlStateManager.func_179120_a(770, 771, 1, 0);
-        GlStateManager.func_179103_j(7425);
-        GlStateManager.func_179097_i();
-        GlStateManager.func_187441_d(1.0f);
+        EventManager.mc.profiler.startSection("client");
+        GlStateManager.disableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.disableAlpha();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        GlStateManager.shadeModel(7425);
+        GlStateManager.disableDepth();
+        GlStateManager.glLineWidth(1.0f);
         final Render3DEvent render3dEvent = new Render3DEvent(event.getPartialTicks());
         esohack.moduleManager.onRender3D(render3dEvent);
-        GlStateManager.func_187441_d(1.0f);
-        GlStateManager.func_179103_j(7424);
-        GlStateManager.func_179084_k();
-        GlStateManager.func_179141_d();
-        GlStateManager.func_179098_w();
-        GlStateManager.func_179126_j();
-        GlStateManager.func_179089_o();
-        GlStateManager.func_179089_o();
-        GlStateManager.func_179132_a(true);
-        GlStateManager.func_179098_w();
-        GlStateManager.func_179147_l();
-        GlStateManager.func_179126_j();
-        EventManager.mc.field_71424_I.func_76319_b();
+        GlStateManager.glLineWidth(1.0f);
+        GlStateManager.shadeModel(7424);
+        GlStateManager.disableBlend();
+        GlStateManager.enableAlpha();
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableDepth();
+        GlStateManager.enableCull();
+        GlStateManager.enableCull();
+        GlStateManager.depthMask(true);
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.enableDepth();
+        EventManager.mc.profiler.endSection();
     }
     
     @SubscribeEvent
@@ -192,7 +192,7 @@ public class EventManager extends Feature
             final ScaledResolution resolution = new ScaledResolution(EventManager.mc);
             final Render2DEvent render2DEvent = new Render2DEvent(event.getPartialTicks(), resolution);
             esohack.moduleManager.onRender2D(render2DEvent);
-            GlStateManager.func_179131_c(1.0f, 1.0f, 1.0f, 1.0f);
+            GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
         }
     }
     
@@ -208,7 +208,7 @@ public class EventManager extends Feature
         if (event.getMessage().startsWith(Command.getCommandPrefix())) {
             event.setCanceled(true);
             try {
-                EventManager.mc.field_71456_v.func_146158_b().func_146239_a(event.getMessage());
+                EventManager.mc.ingameGUI.getChatGUI().addToSentMessages(event.getMessage());
                 if (event.getMessage().length() > 1) {
                     esohack.commandManager.executeCommand(event.getMessage().substring(Command.getCommandPrefix().length() - 1));
                 }

@@ -33,7 +33,7 @@ public class TotemPopManager extends Feature
                 if (player == null) {
                     continue;
                 }
-                Command.sendMessage("§c" + player.func_70005_c_() + " popped " + "§a" + this.getTotemPops(player) + "§c" + " Totem" + ((this.getTotemPops(player) == 1) ? "" : "s") + ".", this.notifications.totemNoti.getValue());
+                Command.sendMessage("§c" + player.getName() + " popped " + "§a" + this.getTotemPops(player) + "§c" + " Totem" + ((this.getTotemPops(player) == 1) ? "" : "s") + ".", this.notifications.totemNoti.getValue());
                 this.toAnnounce.remove(player);
                 this.notifications.totemAnnounce.reset();
                 break;
@@ -51,15 +51,15 @@ public class TotemPopManager extends Feature
     
     public void onTotemPop(final EntityPlayer player) {
         this.popTotem(player);
-        if (!player.equals((Object)TotemPopManager.mc.field_71439_g)) {
+        if (!player.equals((Object)TotemPopManager.mc.player)) {
             this.toAnnounce.add(player);
             this.notifications.totemAnnounce.reset();
         }
     }
     
     public void onDeath(final EntityPlayer player) {
-        if (this.getTotemPops(player) != 0 && !player.equals((Object)TotemPopManager.mc.field_71439_g) && this.notifications.isOn() && this.notifications.totemPops.getValue()) {
-            Command.sendMessage("§c" + player.func_70005_c_() + " died after popping " + "§a" + this.getTotemPops(player) + "§c" + " Totem" + ((this.getTotemPops(player) == 1) ? "" : "s") + ".", this.notifications.totemNoti.getValue());
+        if (this.getTotemPops(player) != 0 && !player.equals((Object)TotemPopManager.mc.player) && this.notifications.isOn() && this.notifications.totemPops.getValue()) {
+            Command.sendMessage("§c" + player.getName() + " died after popping " + "§a" + this.getTotemPops(player) + "§c" + " Totem" + ((this.getTotemPops(player) == 1) ? "" : "s") + ".", this.notifications.totemNoti.getValue());
             this.toAnnounce.remove(player);
         }
         this.resetPops(player);

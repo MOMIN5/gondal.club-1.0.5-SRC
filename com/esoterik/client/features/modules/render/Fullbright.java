@@ -27,32 +27,32 @@ public class Fullbright extends Module
     
     @Override
     public void onEnable() {
-        this.previousSetting = Fullbright.mc.field_71474_y.field_74333_Y;
+        this.previousSetting = Fullbright.mc.gameSettings.gammaSetting;
     }
     
     @Override
     public void onUpdate() {
         if (this.mode.getValue() == Mode.GAMMA) {
-            Fullbright.mc.field_71474_y.field_74333_Y = 1000.0f;
+            Fullbright.mc.gameSettings.gammaSetting = 1000.0f;
         }
         if (this.mode.getValue() == Mode.POTION) {
-            Fullbright.mc.field_71439_g.func_70690_d(new PotionEffect(MobEffects.field_76439_r, 5210));
+            Fullbright.mc.player.addPotionEffect(new PotionEffect(MobEffects.NIGHT_VISION, 5210));
         }
     }
     
     @Override
     public void onDisable() {
         if (this.mode.getValue() == Mode.POTION) {
-            Fullbright.mc.field_71439_g.func_184589_d(MobEffects.field_76439_r);
+            Fullbright.mc.player.removePotionEffect(MobEffects.NIGHT_VISION);
         }
-        Fullbright.mc.field_71474_y.field_74333_Y = this.previousSetting;
+        Fullbright.mc.gameSettings.gammaSetting = this.previousSetting;
     }
     
     @SubscribeEvent
     public void onPacketReceive(final PacketEvent.Receive event) {
         if (event.getStage() == 0 && event.getPacket() instanceof SPacketEntityEffect && this.effects.getValue()) {
             final SPacketEntityEffect packet = event.getPacket();
-            if (Fullbright.mc.field_71439_g != null && packet.func_149426_d() == Fullbright.mc.field_71439_g.func_145782_y() && (packet.func_149427_e() == 9 || packet.func_149427_e() == 15)) {
+            if (Fullbright.mc.player != null && packet.getEntityId() == Fullbright.mc.player.getEntityId() && (packet.getEffectId() == 9 || packet.getEffectId() == 15)) {
                 event.setCanceled(true);
             }
         }

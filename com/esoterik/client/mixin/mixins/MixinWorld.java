@@ -29,7 +29,7 @@ public class MixinWorld
     @Redirect(method = { "getEntitiesWithinAABB(Ljava/lang/Class;Lnet/minecraft/util/math/AxisAlignedBB;Lcom/google/common/base/Predicate;)Ljava/util/List;" }, at = @At(value = "INVOKE", target = "Lnet/minecraft/world/chunk/Chunk;getEntitiesOfTypeWithinAABB(Ljava/lang/Class;Lnet/minecraft/util/math/AxisAlignedBB;Ljava/util/List;Lcom/google/common/base/Predicate;)V"))
     public <T extends Entity> void getEntitiesOfTypeWithinAABBHook(final Chunk chunk, final Class<? extends T> entityClass, final AxisAlignedBB aabb, final List<T> listToFill, final Predicate<? super T> filter) {
         try {
-            chunk.func_177430_a((Class)entityClass, aabb, (List)listToFill, (Predicate)filter);
+            chunk.getEntitiesOfTypeWithinAABB((Class)entityClass, aabb, (List)listToFill, (Predicate)filter);
         }
         catch (Exception ex) {}
     }
@@ -50,6 +50,6 @@ public class MixinWorld
     public boolean isPushedbyWaterHook(final Entity entity) {
         final PushEvent event = new PushEvent(2, entity);
         MinecraftForge.EVENT_BUS.post((Event)event);
-        return entity.func_96092_aw() && !event.isCanceled();
+        return entity.isPushedByWater() && !event.isCanceled();
     }
 }

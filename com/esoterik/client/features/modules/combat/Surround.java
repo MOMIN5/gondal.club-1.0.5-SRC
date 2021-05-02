@@ -72,10 +72,10 @@ public class Surround extends Module
             this.disable();
         }
         super.onEnable();
-        this.lastHotbarSlot = Surround.mc.field_71439_g.field_71071_by.field_70461_c;
-        this.startPos = EntityUtil.getRoundedBlockPos((Entity)Surround.mc.field_71439_g);
+        this.lastHotbarSlot = Surround.mc.player.inventory.currentItem;
+        this.startPos = EntityUtil.getRoundedBlockPos((Entity)Surround.mc.player);
         if (this.center.getValue()) {
-            esohack.positionManager.setPositionPacket(this.startPos.func_177958_n() + 0.5, this.startPos.func_177956_o(), this.startPos.func_177952_p() + 0.5, true, true, true);
+            esohack.positionManager.setPositionPacket(this.startPos.getX() + 0.5, this.startPos.getY(), this.startPos.getZ() + 0.5, true, true, true);
         }
         this.retries.clear();
         this.retryTimer.reset();
@@ -115,13 +115,13 @@ public class Surround extends Module
         if (this.check()) {
             return;
         }
-        if (!EntityUtil.isSafe((Entity)Surround.mc.field_71439_g, 0, true)) {
+        if (!EntityUtil.isSafe((Entity)Surround.mc.player, 0, true)) {
             this.isSafe = 0;
-            this.placeBlocks(Surround.mc.field_71439_g.func_174791_d(), EntityUtil.getUnsafeBlockArray((Entity)Surround.mc.field_71439_g, 0, true), true, false, false);
+            this.placeBlocks(Surround.mc.player.getPositionVector(), EntityUtil.getUnsafeBlockArray((Entity)Surround.mc.player, 0, true), true, false, false);
         }
-        else if (!EntityUtil.isSafe((Entity)Surround.mc.field_71439_g, -1, false)) {
+        else if (!EntityUtil.isSafe((Entity)Surround.mc.player, -1, false)) {
             this.isSafe = 1;
-            this.placeBlocks(Surround.mc.field_71439_g.func_174791_d(), EntityUtil.getUnsafeBlockArray((Entity)Surround.mc.field_71439_g, -1, false), false, false, true);
+            this.placeBlocks(Surround.mc.player.getPositionVector(), EntityUtil.getUnsafeBlockArray((Entity)Surround.mc.player, -1, false), false, false, true);
         }
         else {
             this.isSafe = 2;
@@ -157,14 +157,14 @@ public class Surround extends Module
     private Vec3d areClose(final Vec3d[] vec3ds) {
         int matches = 0;
         for (final Vec3d vec3d : vec3ds) {
-            for (final Vec3d pos : EntityUtil.getUnsafeBlockArray((Entity)Surround.mc.field_71439_g, 0, true)) {
+            for (final Vec3d pos : EntityUtil.getUnsafeBlockArray((Entity)Surround.mc.player, 0, true)) {
                 if (vec3d.equals((Object)pos)) {
                     ++matches;
                 }
             }
         }
         if (matches == 2) {
-            return Surround.mc.field_71439_g.func_174791_d().func_178787_e(vec3ds[0].func_178787_e(vec3ds[1]));
+            return Surround.mc.player.getPositionVector().add(vec3ds[0].add(vec3ds[1]));
         }
         return null;
     }
@@ -173,7 +173,7 @@ public class Surround extends Module
         boolean gotHelp = true;
         for (final Vec3d vec3d : vec3ds) {
             gotHelp = true;
-            final BlockPos position = new BlockPos(pos).func_177963_a(vec3d.field_72450_a, vec3d.field_72448_b, vec3d.field_72449_c);
+            final BlockPos position = new BlockPos(pos).add(vec3d.x, vec3d.y, vec3d.z);
             switch (BlockUtil.isPositionPlaceable(position, false)) {
                 case 1: {
                     if (this.retries.get(position) == null || this.retries.get(position) < 4) {
@@ -188,7 +188,7 @@ public class Surround extends Module
                     if (this.extenders >= 1) {
                         break;
                     }
-                    this.placeBlocks(Surround.mc.field_71439_g.func_174791_d().func_178787_e(vec3d), EntityUtil.getUnsafeBlockArrayFromVec3d(Surround.mc.field_71439_g.func_174791_d().func_178787_e(vec3d), 0, true), hasHelpingBlocks, false, true);
+                    this.placeBlocks(Surround.mc.player.getPositionVector().add(vec3d), EntityUtil.getUnsafeBlockArrayFromVec3d(Surround.mc.player.getPositionVector().add(vec3d), 0, true), hasHelpingBlocks, false, true);
                     this.extendingBlocks.add(vec3d);
                     ++this.extenders;
                     break;
@@ -222,7 +222,7 @@ public class Surround extends Module
         if (obbySlot == -1 && eChestSot == -1) {
             this.toggle();
         }
-        this.offHand = InventoryUtil.isBlock(Surround.mc.field_71439_g.func_184592_cb().func_77973_b(), BlockObsidian.class);
+        this.offHand = InventoryUtil.isBlock(Surround.mc.player.getHeldItemOffhand().getItem(), BlockObsidian.class);
         Surround.isPlacing = false;
         this.didPlace = false;
         this.extenders = 1;
@@ -242,10 +242,10 @@ public class Surround extends Module
             return true;
         }
         this.isSneaking = EntityUtil.stopSneaking(this.isSneaking);
-        if (Surround.mc.field_71439_g.field_71071_by.field_70461_c != this.lastHotbarSlot && Surround.mc.field_71439_g.field_71071_by.field_70461_c != this.obbySlot && Surround.mc.field_71439_g.field_71071_by.field_70461_c != echestSlot) {
-            this.lastHotbarSlot = Surround.mc.field_71439_g.field_71071_by.field_70461_c;
+        if (Surround.mc.player.inventory.currentItem != this.lastHotbarSlot && Surround.mc.player.inventory.currentItem != this.obbySlot && Surround.mc.player.inventory.currentItem != echestSlot) {
+            this.lastHotbarSlot = Surround.mc.player.inventory.currentItem;
         }
-        if (!this.startPos.equals((Object)EntityUtil.getRoundedBlockPos((Entity)Surround.mc.field_71439_g))) {
+        if (!this.startPos.equals((Object)EntityUtil.getRoundedBlockPos((Entity)Surround.mc.player))) {
             this.disable();
             return true;
         }
@@ -254,18 +254,18 @@ public class Surround extends Module
     
     private void placeBlock(final BlockPos pos) {
         if (this.placements < this.blocksPerTick.getValue()) {
-            final int originalSlot = Surround.mc.field_71439_g.field_71071_by.field_70461_c;
+            final int originalSlot = Surround.mc.player.inventory.currentItem;
             final int obbySlot = InventoryUtil.findHotbarBlock(BlockObsidian.class);
             final int eChestSot = InventoryUtil.findHotbarBlock(BlockEnderChest.class);
             if (obbySlot == -1 && eChestSot == -1) {
                 this.toggle();
             }
             Surround.isPlacing = true;
-            Surround.mc.field_71439_g.field_71071_by.field_70461_c = ((obbySlot == -1) ? eChestSot : obbySlot);
-            Surround.mc.field_71442_b.func_78765_e();
+            Surround.mc.player.inventory.currentItem = ((obbySlot == -1) ? eChestSot : obbySlot);
+            Surround.mc.playerController.updateController();
             this.isSneaking = BlockUtil.placeBlock(pos, this.offHand ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND, this.rotate.getValue(), this.packet.getValue(), this.isSneaking);
-            Surround.mc.field_71439_g.field_71071_by.field_70461_c = originalSlot;
-            Surround.mc.field_71442_b.func_78765_e();
+            Surround.mc.player.inventory.currentItem = originalSlot;
+            Surround.mc.playerController.updateController();
             this.didPlace = true;
             ++this.placements;
         }

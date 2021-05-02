@@ -55,13 +55,13 @@ public class MCP extends Module
     
     private void throwPearl() {
         final int pearlSlot = InventoryUtil.findHotbarBlock(ItemEnderPearl.class);
-        final boolean offhand = MCP.mc.field_71439_g.func_184592_cb().func_77973_b() == Items.field_151079_bi;
+        final boolean offhand = MCP.mc.player.getHeldItemOffhand().getItem() == Items.ENDER_PEARL;
         if (pearlSlot != -1 || offhand) {
-            final int oldslot = MCP.mc.field_71439_g.field_71071_by.field_70461_c;
+            final int oldslot = MCP.mc.player.inventory.currentItem;
             if (!offhand) {
                 InventoryUtil.switchToHotbarSlot(pearlSlot, false);
             }
-            MCP.mc.field_71442_b.func_187101_a((EntityPlayer)MCP.mc.field_71439_g, (World)MCP.mc.field_71441_e, offhand ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND);
+            MCP.mc.playerController.processRightClick((EntityPlayer)MCP.mc.player, (World)MCP.mc.world, offhand ? EnumHand.OFF_HAND : EnumHand.MAIN_HAND);
             if (!offhand) {
                 InventoryUtil.switchToHotbarSlot(oldslot, false);
             }

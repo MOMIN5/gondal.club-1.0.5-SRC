@@ -29,25 +29,25 @@ public abstract class MixinLayerBipedArmor extends LayerArmorBase<ModelBiped>
             info.cancel();
             switch (slotIn) {
                 case HEAD: {
-                    model.field_78116_c.field_78806_j = false;
-                    model.field_178720_f.field_78806_j = false;
+                    model.bipedHead.showModel = false;
+                    model.bipedHeadwear.showModel = false;
                     break;
                 }
                 case CHEST: {
-                    model.field_78115_e.field_78806_j = (noArmor.noArmor.getValue() != NoRender.NoArmor.ALL);
-                    model.field_178723_h.field_78806_j = (noArmor.noArmor.getValue() != NoRender.NoArmor.ALL);
-                    model.field_178724_i.field_78806_j = (noArmor.noArmor.getValue() != NoRender.NoArmor.ALL);
+                    model.bipedBody.showModel = (noArmor.noArmor.getValue() != NoRender.NoArmor.ALL);
+                    model.bipedRightArm.showModel = (noArmor.noArmor.getValue() != NoRender.NoArmor.ALL);
+                    model.bipedLeftArm.showModel = (noArmor.noArmor.getValue() != NoRender.NoArmor.ALL);
                     break;
                 }
                 case LEGS: {
-                    model.field_78115_e.field_78806_j = (noArmor.noArmor.getValue() != NoRender.NoArmor.ALL);
-                    model.field_178721_j.field_78806_j = (noArmor.noArmor.getValue() != NoRender.NoArmor.ALL);
-                    model.field_178722_k.field_78806_j = (noArmor.noArmor.getValue() != NoRender.NoArmor.ALL);
+                    model.bipedBody.showModel = (noArmor.noArmor.getValue() != NoRender.NoArmor.ALL);
+                    model.bipedRightLeg.showModel = (noArmor.noArmor.getValue() != NoRender.NoArmor.ALL);
+                    model.bipedLeftLeg.showModel = (noArmor.noArmor.getValue() != NoRender.NoArmor.ALL);
                     break;
                 }
                 case FEET: {
-                    model.field_178721_j.field_78806_j = (noArmor.noArmor.getValue() != NoRender.NoArmor.ALL);
-                    model.field_178722_k.field_78806_j = (noArmor.noArmor.getValue() != NoRender.NoArmor.ALL);
+                    model.bipedRightLeg.showModel = (noArmor.noArmor.getValue() != NoRender.NoArmor.ALL);
+                    model.bipedLeftLeg.showModel = (noArmor.noArmor.getValue() != NoRender.NoArmor.ALL);
                     break;
                 }
             }

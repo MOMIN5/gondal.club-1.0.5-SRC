@@ -27,11 +27,11 @@ public class Notifications
     }
     
     public void onDraw(final int y) {
-        final ScaledResolution scaledResolution = new ScaledResolution(Minecraft.func_71410_x());
+        final ScaledResolution scaledResolution = new ScaledResolution(Minecraft.getMinecraft());
         if (this.timer.passedMs(this.disableTime)) {
             esohack.notificationManager.getNotifications().remove(this);
         }
-        RenderUtil.drawRect(scaledResolution.func_78326_a() - 4 - this.width, (float)y, (float)(scaledResolution.func_78326_a() - 2), (float)(y + esohack.moduleManager.getModuleByClass(HUD.class).renderer.getFontHeight() + 3), 1962934272);
-        esohack.moduleManager.getModuleByClass(HUD.class).renderer.drawString(this.text, scaledResolution.func_78326_a() - this.width - 3.0f, (float)(y + 2), -1, true);
+        RenderUtil.drawRect(scaledResolution.getScaledWidth() - 4 - this.width, (float)y, (float)(scaledResolution.getScaledWidth() - 2), (float)(y + esohack.moduleManager.getModuleByClass(HUD.class).renderer.getFontHeight() + 3), 1962934272);
+        esohack.moduleManager.getModuleByClass(HUD.class).renderer.drawString(this.text, scaledResolution.getScaledWidth() - this.width - 3.0f, (float)(y + 2), -1, true);
     }
 }

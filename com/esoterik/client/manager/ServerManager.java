@@ -98,7 +98,7 @@ public class ServerManager extends Feature
             return 0;
         }
         try {
-            return Objects.requireNonNull(ServerManager.mc.func_147114_u()).func_175102_a(ServerManager.mc.func_147114_u().func_175105_e().getId()).func_178853_c();
+            return Objects.requireNonNull(ServerManager.mc.getConnection()).getPlayerInfo(ServerManager.mc.getConnection().getGameProfile().getId()).getResponseTime();
         }
         catch (Exception e) {
             return 0;

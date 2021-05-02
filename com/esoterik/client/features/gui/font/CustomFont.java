@@ -82,14 +82,14 @@ public class CustomFont extends CFont
         y = (y - 3.0) * 2.0;
         if (render) {
             GL11.glPushMatrix();
-            GlStateManager.func_179139_a(0.5, 0.5, 0.5);
-            GlStateManager.func_179147_l();
-            GlStateManager.func_179112_b(770, 771);
-            GlStateManager.func_179131_c((color >> 16 & 0xFF) / 255.0f, (color >> 8 & 0xFF) / 255.0f, (color & 0xFF) / 255.0f, alpha);
+            GlStateManager.scale(0.5, 0.5, 0.5);
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(770, 771);
+            GlStateManager.color((color >> 16 & 0xFF) / 255.0f, (color >> 8 & 0xFF) / 255.0f, (color & 0xFF) / 255.0f, alpha);
             final int size = text.length();
-            GlStateManager.func_179098_w();
-            GlStateManager.func_179144_i(this.tex.func_110552_b());
-            GL11.glBindTexture(3553, this.tex.func_110552_b());
+            GlStateManager.enableTexture2D();
+            GlStateManager.bindTexture(this.tex.getGlTextureId());
+            GL11.glBindTexture(3553, this.tex.getGlTextureId());
             for (int i = 0; i < size; ++i) {
                 final char character = text.charAt(i);
                 if (character == '§' && i < size) {
@@ -105,7 +105,7 @@ public class CustomFont extends CFont
                         italic = false;
                         underline = false;
                         strikethrough = false;
-                        GlStateManager.func_179144_i(this.tex.func_110552_b());
+                        GlStateManager.bindTexture(this.tex.getGlTextureId());
                         currentData = this.charData;
                         if (colorIndex < 0 || colorIndex > 15) {
                             colorIndex = 15;
@@ -114,16 +114,16 @@ public class CustomFont extends CFont
                             colorIndex += 16;
                         }
                         final int colorcode = this.colorCode[colorIndex];
-                        GlStateManager.func_179131_c((colorcode >> 16 & 0xFF) / 255.0f, (colorcode >> 8 & 0xFF) / 255.0f, (colorcode & 0xFF) / 255.0f, alpha);
+                        GlStateManager.color((colorcode >> 16 & 0xFF) / 255.0f, (colorcode >> 8 & 0xFF) / 255.0f, (colorcode & 0xFF) / 255.0f, alpha);
                     }
                     else if (colorIndex == 17) {
                         bold = true;
                         if (italic) {
-                            GlStateManager.func_179144_i(this.texItalicBold.func_110552_b());
+                            GlStateManager.bindTexture(this.texItalicBold.getGlTextureId());
                             currentData = this.boldItalicChars;
                         }
                         else {
-                            GlStateManager.func_179144_i(this.texBold.func_110552_b());
+                            GlStateManager.bindTexture(this.texBold.getGlTextureId());
                             currentData = this.boldChars;
                         }
                     }
@@ -136,11 +136,11 @@ public class CustomFont extends CFont
                     else if (colorIndex == 20) {
                         italic = true;
                         if (bold) {
-                            GlStateManager.func_179144_i(this.texItalicBold.func_110552_b());
+                            GlStateManager.bindTexture(this.texItalicBold.getGlTextureId());
                             currentData = this.boldItalicChars;
                         }
                         else {
-                            GlStateManager.func_179144_i(this.texItalic.func_110552_b());
+                            GlStateManager.bindTexture(this.texItalic.getGlTextureId());
                             currentData = this.italicChars;
                         }
                     }
@@ -149,8 +149,8 @@ public class CustomFont extends CFont
                         italic = false;
                         underline = false;
                         strikethrough = false;
-                        GlStateManager.func_179131_c((color >> 16 & 0xFF) / 255.0f, (color >> 8 & 0xFF) / 255.0f, (color & 0xFF) / 255.0f, alpha);
-                        GlStateManager.func_179144_i(this.tex.func_110552_b());
+                        GlStateManager.color((color >> 16 & 0xFF) / 255.0f, (color >> 8 & 0xFF) / 255.0f, (color & 0xFF) / 255.0f, alpha);
+                        GlStateManager.bindTexture(this.tex.getGlTextureId());
                         currentData = this.charData;
                     }
                     ++i;

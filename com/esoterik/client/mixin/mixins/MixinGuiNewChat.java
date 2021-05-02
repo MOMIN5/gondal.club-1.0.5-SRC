@@ -18,7 +18,7 @@ public class MixinGuiNewChat extends Gui
 {
     @Redirect(method = { "drawChat" }, at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiNewChat;drawRect(IIIII)V"))
     private void drawRectHook(final int left, final int top, final int right, final int bottom, final int color) {
-        Gui.func_73734_a(left, top, right, bottom, (ChatModifier.getInstance().isOn() && ChatModifier.getInstance().clean.getValue()) ? 0 : color);
+        Gui.drawRect(left, top, right, bottom, (ChatModifier.getInstance().isOn() && ChatModifier.getInstance().clean.getValue()) ? 0 : color);
     }
     
     @Redirect(method = { "setChatLine" }, at = @At(value = "INVOKE", target = "Ljava/util/List;size()I", ordinal = 0))

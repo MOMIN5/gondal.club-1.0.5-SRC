@@ -58,7 +58,7 @@ public class ChatModifier extends Module
     public void onPacketSend(final PacketEvent.Send event) {
         if (event.getStage() == 0 && event.getPacket() instanceof CPacketChatMessage) {
             final CPacketChatMessage packet = event.getPacket();
-            String s = packet.func_149439_c();
+            String s = packet.getMessage();
             if (s.startsWith("/") || s.startsWith("!")) {
                 return;
             }
@@ -71,19 +71,19 @@ public class ChatModifier extends Module
             if (s.length() >= 256) {
                 s = s.substring(0, 256);
             }
-            packet.field_149440_a = s;
+            packet.message = s;
         }
     }
     
     @SubscribeEvent
     public void onPacketReceive(final PacketEvent.Receive event) {
         if (event.getStage() == 0 && this.timeStamps.getValue() != TextUtil.Color.NONE && event.getPacket() instanceof SPacketChat) {
-            if (!event.getPacket().func_148916_d()) {
+            if (!event.getPacket().isSystem()) {
                 return;
             }
-            final String originalMessage = event.getPacket().field_148919_a.func_150260_c();
+            final String originalMessage = event.getPacket().chatComponent.getUnformattedText();
             final String message = this.getTimeString() + originalMessage;
-            event.getPacket().field_148919_a = (ITextComponent)new TextComponentString(message);
+            event.getPacket().chatComponent = (ITextComponent)new TextComponentString(message);
         }
     }
     
@@ -93,7 +93,7 @@ public class ChatModifier extends Module
     }
     
     private boolean shouldSendMessage(final EntityPlayer player) {
-        return player.field_71093_bK == 1 && player.func_180425_c().equals((Object)new Vec3i(0, 240, 0));
+        return player.dimension == 1 && player.getPosition().equals((Object)new Vec3i(0, 240, 0));
     }
     
     static {

@@ -134,23 +134,23 @@ public class Components extends Module
         if (this.targetHudBackground.getValue()) {
             RenderUtil.drawRectangleCorrectly(this.targetHudX.getValue(), this.targetHudY.getValue(), 210, 100, ColorUtil.toRGBA(20, 20, 20, 160));
         }
-        GlStateManager.func_179101_C();
-        GlStateManager.func_179138_g(OpenGlHelper.field_77476_b);
-        GlStateManager.func_179090_x();
-        GlStateManager.func_179138_g(OpenGlHelper.field_77478_a);
-        GlStateManager.func_179131_c(1.0f, 1.0f, 1.0f, 1.0f);
+        GlStateManager.disableRescaleNormal();
+        GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+        GlStateManager.disableTexture2D();
+        GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
         try {
-            GuiInventory.func_147046_a(this.targetHudX.getValue() + 30, this.targetHudY.getValue() + 90, 45, 0.0f, 0.0f, (EntityLivingBase)target);
+            GuiInventory.drawEntityOnScreen(this.targetHudX.getValue() + 30, this.targetHudY.getValue() + 90, 45, 0.0f, 0.0f, (EntityLivingBase)target);
         }
         catch (Exception e) {
             e.printStackTrace();
         }
-        GlStateManager.func_179091_B();
-        GlStateManager.func_179098_w();
-        GlStateManager.func_179147_l();
-        GlStateManager.func_179120_a(770, 771, 1, 0);
-        this.renderer.drawStringWithShadow(target.func_70005_c_(), (float)(this.targetHudX.getValue() + 60), (float)(this.targetHudY.getValue() + 10), ColorUtil.toRGBA(255, 0, 0, 255));
-        final float health = target.func_110143_aJ() + target.func_110139_bj();
+        GlStateManager.enableRescaleNormal();
+        GlStateManager.enableTexture2D();
+        GlStateManager.enableBlend();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        this.renderer.drawStringWithShadow(target.getName(), (float)(this.targetHudX.getValue() + 60), (float)(this.targetHudY.getValue() + 10), ColorUtil.toRGBA(255, 0, 0, 255));
+        final float health = target.getHealth() + target.getAbsorptionAmount();
         int healthColor;
         if (health >= 16.0f) {
             healthColor = ColorUtil.toRGBA(0, 255, 0, 255);
@@ -162,8 +162,8 @@ public class Components extends Module
             healthColor = ColorUtil.toRGBA(255, 0, 0, 255);
         }
         final DecimalFormat df = new DecimalFormat("##.#");
-        this.renderer.drawStringWithShadow(df.format(target.func_110143_aJ() + target.func_110139_bj()), (float)(this.targetHudX.getValue() + 60 + this.renderer.getStringWidth(target.func_70005_c_() + "  ")), (float)(this.targetHudY.getValue() + 10), healthColor);
-        final Integer ping = EntityUtil.isFakePlayer(target) ? 0 : ((Components.mc.func_147114_u().func_175102_a(target.func_110124_au()) == null) ? 0 : Components.mc.func_147114_u().func_175102_a(target.func_110124_au()).func_178853_c());
+        this.renderer.drawStringWithShadow(df.format(target.getHealth() + target.getAbsorptionAmount()), (float)(this.targetHudX.getValue() + 60 + this.renderer.getStringWidth(target.getName() + "  ")), (float)(this.targetHudY.getValue() + 10), healthColor);
+        final Integer ping = EntityUtil.isFakePlayer(target) ? 0 : ((Components.mc.getConnection().getPlayerInfo(target.getUniqueID()) == null) ? 0 : Components.mc.getConnection().getPlayerInfo(target.getUniqueID()).getResponseTime());
         int color;
         if (ping >= 100) {
             color = ColorUtil.toRGBA(0, 255, 0, 255);
@@ -176,42 +176,42 @@ public class Components extends Module
         }
         this.renderer.drawStringWithShadow("Ping: " + ((ping == null) ? 0 : ping), (float)(this.targetHudX.getValue() + 60), (float)(this.targetHudY.getValue() + this.renderer.getFontHeight() + 20), color);
         this.renderer.drawStringWithShadow("Pops: " + esohack.totemPopManager.getTotemPops(target), (float)(this.targetHudX.getValue() + 60), (float)(this.targetHudY.getValue() + this.renderer.getFontHeight() * 2 + 30), ColorUtil.toRGBA(255, 0, 0, 255));
-        GlStateManager.func_179098_w();
+        GlStateManager.enableTexture2D();
         int iteration = 0;
         final int i = this.targetHudX.getValue() + 50;
         final int y = this.targetHudY.getValue() + this.renderer.getFontHeight() * 3 + 44;
-        for (final ItemStack is : target.field_71071_by.field_70460_b) {
+        for (final ItemStack is : target.inventory.armorInventory) {
             ++iteration;
-            if (is.func_190926_b()) {
+            if (is.isEmpty()) {
                 continue;
             }
             final int x = i - 90 + (9 - iteration) * 20 + 2;
-            GlStateManager.func_179126_j();
-            RenderUtil.itemRender.field_77023_b = 200.0f;
-            RenderUtil.itemRender.func_180450_b(is, x, y);
-            RenderUtil.itemRender.func_180453_a(Components.mc.field_71466_p, is, x, y, "");
-            RenderUtil.itemRender.field_77023_b = 0.0f;
-            GlStateManager.func_179098_w();
-            GlStateManager.func_179140_f();
-            GlStateManager.func_179097_i();
-            final String s = (is.func_190916_E() > 1) ? (is.func_190916_E() + "") : "";
+            GlStateManager.enableDepth();
+            RenderUtil.itemRender.zLevel = 200.0f;
+            RenderUtil.itemRender.renderItemAndEffectIntoGUI(is, x, y);
+            RenderUtil.itemRender.renderItemOverlayIntoGUI(Components.mc.fontRenderer, is, x, y, "");
+            RenderUtil.itemRender.zLevel = 0.0f;
+            GlStateManager.enableTexture2D();
+            GlStateManager.disableLighting();
+            GlStateManager.disableDepth();
+            final String s = (is.getCount() > 1) ? (is.getCount() + "") : "";
             this.renderer.drawStringWithShadow(s, (float)(x + 19 - 2 - this.renderer.getStringWidth(s)), (float)(y + 9), 16777215);
             int dmg = 0;
-            final int itemDurability = is.func_77958_k() - is.func_77952_i();
-            final float green = (is.func_77958_k() - (float)is.func_77952_i()) / is.func_77958_k();
+            final int itemDurability = is.getMaxDamage() - is.getItemDamage();
+            final float green = (is.getMaxDamage() - (float)is.getItemDamage()) / is.getMaxDamage();
             final float red = 1.0f - green;
             dmg = 100 - (int)(red * 100.0f);
             this.renderer.drawStringWithShadow(dmg + "", x + 8 - this.renderer.getStringWidth(dmg + "") / 2.0f, (float)(y - 5), ColorUtil.toRGBA((int)(red * 255.0f), (int)(green * 255.0f), 0));
         }
         this.drawOverlay(partialTicks, (Entity)target, this.targetHudX.getValue() + 150, this.targetHudY.getValue() + 6);
-        this.renderer.drawStringWithShadow("Strength", (float)(this.targetHudX.getValue() + 150), (float)(this.targetHudY.getValue() + 60), target.func_70644_a(MobEffects.field_76420_g) ? ColorUtil.toRGBA(0, 255, 0, 255) : ColorUtil.toRGBA(255, 0, 0, 255));
-        this.renderer.drawStringWithShadow("Weakness", (float)(this.targetHudX.getValue() + 150), (float)(this.targetHudY.getValue() + this.renderer.getFontHeight() + 70), target.func_70644_a(MobEffects.field_76437_t) ? ColorUtil.toRGBA(0, 255, 0, 255) : ColorUtil.toRGBA(255, 0, 0, 255));
+        this.renderer.drawStringWithShadow("Strength", (float)(this.targetHudX.getValue() + 150), (float)(this.targetHudY.getValue() + 60), target.isPotionActive(MobEffects.STRENGTH) ? ColorUtil.toRGBA(0, 255, 0, 255) : ColorUtil.toRGBA(255, 0, 0, 255));
+        this.renderer.drawStringWithShadow("Weakness", (float)(this.targetHudX.getValue() + 150), (float)(this.targetHudY.getValue() + this.renderer.getFontHeight() + 70), target.isPotionActive(MobEffects.WEAKNESS) ? ColorUtil.toRGBA(0, 255, 0, 255) : ColorUtil.toRGBA(255, 0, 0, 255));
     }
     
     public static EntityPlayer getClosestEnemy() {
         EntityPlayer closestPlayer = null;
-        for (final EntityPlayer player : Components.mc.field_71441_e.field_73010_i) {
-            if (player == Components.mc.field_71439_g) {
+        for (final EntityPlayer player : Components.mc.world.playerEntities) {
+            if (player == Components.mc.player) {
                 continue;
             }
             if (esohack.friendManager.isFriend(player)) {
@@ -221,7 +221,7 @@ public class Components extends Module
                 closestPlayer = player;
             }
             else {
-                if (Components.mc.field_71439_g.func_70068_e((Entity)player) >= Components.mc.field_71439_g.func_70068_e((Entity)closestPlayer)) {
+                if (Components.mc.player.getDistanceSq((Entity)player) >= Components.mc.player.getDistanceSq((Entity)closestPlayer)) {
                     continue;
                 }
                 closestPlayer = player;
@@ -231,24 +231,24 @@ public class Components extends Module
     }
     
     public void drawImageLogo() {
-        GlStateManager.func_179098_w();
-        GlStateManager.func_179084_k();
-        Components.mc.func_110434_K().func_110577_a(this.logo);
+        GlStateManager.enableTexture2D();
+        GlStateManager.disableBlend();
+        Components.mc.getTextureManager().bindTexture(this.logo);
         drawCompleteImage(this.imageX.getValue(), this.imageY.getValue(), this.imageWidth.getValue(), this.imageHeight.getValue());
-        Components.mc.func_110434_K().func_147645_c(this.logo);
-        GlStateManager.func_179147_l();
-        GlStateManager.func_179090_x();
+        Components.mc.getTextureManager().deleteTexture(this.logo);
+        GlStateManager.enableBlend();
+        GlStateManager.disableTexture2D();
     }
     
     public void drawCompass() {
         final ScaledResolution sr = new ScaledResolution(Components.mc);
         if (this.compass.getValue() == Compass.LINE) {
-            final float playerYaw = Components.mc.field_71439_g.field_70177_z;
+            final float playerYaw = Components.mc.player.rotationYaw;
             final float rotationYaw = MathUtil.wrap(playerYaw);
             RenderUtil.drawRect(this.compassX.getValue(), this.compassY.getValue(), (float)(this.compassX.getValue() + 100), (float)(this.compassY.getValue() + this.renderer.getFontHeight()), 1963986960);
             RenderUtil.glScissor(this.compassX.getValue(), this.compassY.getValue(), (float)(this.compassX.getValue() + 100), (float)(this.compassY.getValue() + this.renderer.getFontHeight()), sr);
             GL11.glEnable(3089);
-            final float zeroZeroYaw = MathUtil.wrap((float)(Math.atan2(0.0 - Components.mc.field_71439_g.field_70161_v, 0.0 - Components.mc.field_71439_g.field_70165_t) * 180.0 / 3.141592653589793) - 90.0f);
+            final float zeroZeroYaw = MathUtil.wrap((float)(Math.atan2(0.0 - Components.mc.player.posZ, 0.0 - Components.mc.player.posX) * 180.0 / 3.141592653589793) - 90.0f);
             RenderUtil.drawLine(this.compassX.getValue() - rotationYaw + 50.0f + zeroZeroYaw, (float)(this.compassY.getValue() + 2), this.compassX.getValue() - rotationYaw + 50.0f + zeroZeroYaw, (float)(this.compassY.getValue() + this.renderer.getFontHeight() - 2), 2.0f, -61424);
             RenderUtil.drawLine(this.compassX.getValue() - rotationYaw + 50.0f + 45.0f, (float)(this.compassY.getValue() + 2), this.compassX.getValue() - rotationYaw + 50.0f + 45.0f, (float)(this.compassY.getValue() + this.renderer.getFontHeight() - 2), 2.0f, -1);
             RenderUtil.drawLine(this.compassX.getValue() - rotationYaw + 50.0f - 45.0f, (float)(this.compassY.getValue() + 2), this.compassX.getValue() - rotationYaw + 50.0f - 45.0f, (float)(this.compassY.getValue() + this.renderer.getFontHeight() - 2), 2.0f, -1);
@@ -274,82 +274,82 @@ public class Components extends Module
     
     public void drawPlayer(final EntityPlayer player, final int x, final int y) {
         final EntityPlayer ent = player;
-        GlStateManager.func_179094_E();
-        GlStateManager.func_179124_c(1.0f, 1.0f, 1.0f);
-        RenderHelper.func_74519_b();
-        GlStateManager.func_179141_d();
-        GlStateManager.func_179103_j(7424);
-        GlStateManager.func_179141_d();
-        GlStateManager.func_179126_j();
-        GlStateManager.func_179114_b(0.0f, 0.0f, 5.0f, 0.0f);
-        GlStateManager.func_179142_g();
-        GlStateManager.func_179094_E();
-        GlStateManager.func_179109_b((float)(this.playerViewerX.getValue() + 25), (float)(this.playerViewerY.getValue() + 25), 50.0f);
-        GlStateManager.func_179152_a(-50.0f * this.playerScale.getValue(), 50.0f * this.playerScale.getValue(), 50.0f * this.playerScale.getValue());
-        GlStateManager.func_179114_b(180.0f, 0.0f, 0.0f, 1.0f);
-        GlStateManager.func_179114_b(135.0f, 0.0f, 1.0f, 0.0f);
-        RenderHelper.func_74519_b();
-        GlStateManager.func_179114_b(-135.0f, 0.0f, 1.0f, 0.0f);
-        GlStateManager.func_179114_b(-(float)Math.atan(this.playerViewerY.getValue() / 40.0f) * 20.0f, 1.0f, 0.0f, 0.0f);
-        GlStateManager.func_179109_b(0.0f, 0.0f, 0.0f);
-        final RenderManager rendermanager = Components.mc.func_175598_ae();
-        rendermanager.func_178631_a(180.0f);
-        rendermanager.func_178633_a(false);
+        GlStateManager.pushMatrix();
+        GlStateManager.color(1.0f, 1.0f, 1.0f);
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.enableAlpha();
+        GlStateManager.shadeModel(7424);
+        GlStateManager.enableAlpha();
+        GlStateManager.enableDepth();
+        GlStateManager.rotate(0.0f, 0.0f, 5.0f, 0.0f);
+        GlStateManager.enableColorMaterial();
+        GlStateManager.pushMatrix();
+        GlStateManager.translate((float)(this.playerViewerX.getValue() + 25), (float)(this.playerViewerY.getValue() + 25), 50.0f);
+        GlStateManager.scale(-50.0f * this.playerScale.getValue(), 50.0f * this.playerScale.getValue(), 50.0f * this.playerScale.getValue());
+        GlStateManager.rotate(180.0f, 0.0f, 0.0f, 1.0f);
+        GlStateManager.rotate(135.0f, 0.0f, 1.0f, 0.0f);
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.rotate(-135.0f, 0.0f, 1.0f, 0.0f);
+        GlStateManager.rotate(-(float)Math.atan(this.playerViewerY.getValue() / 40.0f) * 20.0f, 1.0f, 0.0f, 0.0f);
+        GlStateManager.translate(0.0f, 0.0f, 0.0f);
+        final RenderManager rendermanager = Components.mc.getRenderManager();
+        rendermanager.setPlayerViewY(180.0f);
+        rendermanager.setRenderShadow(false);
         try {
-            rendermanager.func_188391_a((Entity)ent, 0.0, 0.0, 0.0, 0.0f, 1.0f, false);
+            rendermanager.renderEntity((Entity)ent, 0.0, 0.0, 0.0, 0.0f, 1.0f, false);
         }
         catch (Exception ex) {}
-        rendermanager.func_178633_a(true);
-        GlStateManager.func_179121_F();
-        RenderHelper.func_74518_a();
-        GlStateManager.func_179101_C();
-        GlStateManager.func_179138_g(OpenGlHelper.field_77476_b);
-        GlStateManager.func_179090_x();
-        GlStateManager.func_179138_g(OpenGlHelper.field_77478_a);
-        GlStateManager.func_179143_c(515);
-        GlStateManager.func_179117_G();
-        GlStateManager.func_179097_i();
-        GlStateManager.func_179121_F();
+        rendermanager.setRenderShadow(true);
+        GlStateManager.popMatrix();
+        RenderHelper.disableStandardItemLighting();
+        GlStateManager.disableRescaleNormal();
+        GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+        GlStateManager.disableTexture2D();
+        GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+        GlStateManager.depthFunc(515);
+        GlStateManager.resetColor();
+        GlStateManager.disableDepth();
+        GlStateManager.popMatrix();
     }
     
     public void drawPlayer() {
-        final EntityPlayer ent = (EntityPlayer)Components.mc.field_71439_g;
-        GlStateManager.func_179094_E();
-        GlStateManager.func_179124_c(1.0f, 1.0f, 1.0f);
-        RenderHelper.func_74519_b();
-        GlStateManager.func_179141_d();
-        GlStateManager.func_179103_j(7424);
-        GlStateManager.func_179141_d();
-        GlStateManager.func_179126_j();
-        GlStateManager.func_179114_b(0.0f, 0.0f, 5.0f, 0.0f);
-        GlStateManager.func_179142_g();
-        GlStateManager.func_179094_E();
-        GlStateManager.func_179109_b((float)(this.playerViewerX.getValue() + 25), (float)(this.playerViewerY.getValue() + 25), 50.0f);
-        GlStateManager.func_179152_a(-50.0f * this.playerScale.getValue(), 50.0f * this.playerScale.getValue(), 50.0f * this.playerScale.getValue());
-        GlStateManager.func_179114_b(180.0f, 0.0f, 0.0f, 1.0f);
-        GlStateManager.func_179114_b(135.0f, 0.0f, 1.0f, 0.0f);
-        RenderHelper.func_74519_b();
-        GlStateManager.func_179114_b(-135.0f, 0.0f, 1.0f, 0.0f);
-        GlStateManager.func_179114_b(-(float)Math.atan(this.playerViewerY.getValue() / 40.0f) * 20.0f, 1.0f, 0.0f, 0.0f);
-        GlStateManager.func_179109_b(0.0f, 0.0f, 0.0f);
-        final RenderManager rendermanager = Components.mc.func_175598_ae();
-        rendermanager.func_178631_a(180.0f);
-        rendermanager.func_178633_a(false);
+        final EntityPlayer ent = (EntityPlayer)Components.mc.player;
+        GlStateManager.pushMatrix();
+        GlStateManager.color(1.0f, 1.0f, 1.0f);
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.enableAlpha();
+        GlStateManager.shadeModel(7424);
+        GlStateManager.enableAlpha();
+        GlStateManager.enableDepth();
+        GlStateManager.rotate(0.0f, 0.0f, 5.0f, 0.0f);
+        GlStateManager.enableColorMaterial();
+        GlStateManager.pushMatrix();
+        GlStateManager.translate((float)(this.playerViewerX.getValue() + 25), (float)(this.playerViewerY.getValue() + 25), 50.0f);
+        GlStateManager.scale(-50.0f * this.playerScale.getValue(), 50.0f * this.playerScale.getValue(), 50.0f * this.playerScale.getValue());
+        GlStateManager.rotate(180.0f, 0.0f, 0.0f, 1.0f);
+        GlStateManager.rotate(135.0f, 0.0f, 1.0f, 0.0f);
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.rotate(-135.0f, 0.0f, 1.0f, 0.0f);
+        GlStateManager.rotate(-(float)Math.atan(this.playerViewerY.getValue() / 40.0f) * 20.0f, 1.0f, 0.0f, 0.0f);
+        GlStateManager.translate(0.0f, 0.0f, 0.0f);
+        final RenderManager rendermanager = Components.mc.getRenderManager();
+        rendermanager.setPlayerViewY(180.0f);
+        rendermanager.setRenderShadow(false);
         try {
-            rendermanager.func_188391_a((Entity)ent, 0.0, 0.0, 0.0, 0.0f, 1.0f, false);
+            rendermanager.renderEntity((Entity)ent, 0.0, 0.0, 0.0, 0.0f, 1.0f, false);
         }
         catch (Exception ex) {}
-        rendermanager.func_178633_a(true);
-        GlStateManager.func_179121_F();
-        RenderHelper.func_74518_a();
-        GlStateManager.func_179101_C();
-        GlStateManager.func_179138_g(OpenGlHelper.field_77476_b);
-        GlStateManager.func_179090_x();
-        GlStateManager.func_179138_g(OpenGlHelper.field_77478_a);
-        GlStateManager.func_179143_c(515);
-        GlStateManager.func_179117_G();
-        GlStateManager.func_179097_i();
-        GlStateManager.func_179121_F();
+        rendermanager.setRenderShadow(true);
+        GlStateManager.popMatrix();
+        RenderHelper.disableStandardItemLighting();
+        GlStateManager.disableRescaleNormal();
+        GlStateManager.setActiveTexture(OpenGlHelper.lightmapTexUnit);
+        GlStateManager.disableTexture2D();
+        GlStateManager.setActiveTexture(OpenGlHelper.defaultTexUnit);
+        GlStateManager.depthFunc(515);
+        GlStateManager.resetColor();
+        GlStateManager.disableDepth();
+        GlStateManager.popMatrix();
     }
     
     private double getX(final double rad) {
@@ -357,20 +357,20 @@ public class Components extends Module
     }
     
     private double getY(final double rad) {
-        final double epicPitch = MathHelper.func_76131_a(Components.mc.field_71439_g.field_70125_A + 30.0f, -90.0f, 90.0f);
+        final double epicPitch = MathHelper.clamp(Components.mc.player.rotationPitch + 30.0f, -90.0f, 90.0f);
         final double pitchRadians = Math.toRadians(epicPitch);
         return Math.cos(rad) * Math.sin(pitchRadians) * (this.scale.getValue() * 10);
     }
     
     private static double getPosOnCompass(final Direction dir) {
-        final double yaw = Math.toRadians(MathHelper.func_76142_g(Components.mc.field_71439_g.field_70177_z));
+        final double yaw = Math.toRadians(MathHelper.wrapDegrees(Components.mc.player.rotationYaw));
         final int index = dir.ordinal();
         return yaw + index * 1.5707963267948966;
     }
     
     public void drawOverlay(final float partialTicks) {
         float yaw = 0.0f;
-        final int dir = MathHelper.func_76128_c(Components.mc.field_71439_g.field_70177_z * 4.0f / 360.0f + 0.5) & 0x3;
+        final int dir = MathHelper.floor(Components.mc.player.rotationYaw * 4.0f / 360.0f + 0.5) & 0x3;
         switch (dir) {
             case 1: {
                 yaw = 90.0f;
@@ -387,7 +387,7 @@ public class Components extends Module
         }
         final BlockPos northPos = this.traceToBlock(partialTicks, yaw);
         final Block north = this.getBlock(northPos);
-        if (north != null && north != Blocks.field_150350_a) {
+        if (north != null && north != Blocks.AIR) {
             final int damage = this.getBlockDamage(northPos);
             if (damage != 0) {
                 RenderUtil.drawRect((float)(this.holeX.getValue() + 16), this.holeY.getValue(), (float)(this.holeX.getValue() + 32), (float)(this.holeY.getValue() + 16), 1627324416);
@@ -396,7 +396,7 @@ public class Components extends Module
         }
         final BlockPos southPos = this.traceToBlock(partialTicks, yaw - 180.0f);
         final Block south = this.getBlock(southPos);
-        if (south != null && south != Blocks.field_150350_a) {
+        if (south != null && south != Blocks.AIR) {
             final int damage2 = this.getBlockDamage(southPos);
             if (damage2 != 0) {
                 RenderUtil.drawRect((float)(this.holeX.getValue() + 16), (float)(this.holeY.getValue() + 32), (float)(this.holeX.getValue() + 32), (float)(this.holeY.getValue() + 48), 1627324416);
@@ -405,7 +405,7 @@ public class Components extends Module
         }
         final BlockPos eastPos = this.traceToBlock(partialTicks, yaw + 90.0f);
         final Block east = this.getBlock(eastPos);
-        if (east != null && east != Blocks.field_150350_a) {
+        if (east != null && east != Blocks.AIR) {
             final int damage3 = this.getBlockDamage(eastPos);
             if (damage3 != 0) {
                 RenderUtil.drawRect((float)(this.holeX.getValue() + 32), (float)(this.holeY.getValue() + 16), (float)(this.holeX.getValue() + 48), (float)(this.holeY.getValue() + 32), 1627324416);
@@ -414,7 +414,7 @@ public class Components extends Module
         }
         final BlockPos westPos = this.traceToBlock(partialTicks, yaw - 90.0f);
         final Block west = this.getBlock(westPos);
-        if (west != null && west != Blocks.field_150350_a) {
+        if (west != null && west != Blocks.AIR) {
             final int damage4 = this.getBlockDamage(westPos);
             if (damage4 != 0) {
                 RenderUtil.drawRect(this.holeX.getValue(), (float)(this.holeY.getValue() + 16), (float)(this.holeX.getValue() + 16), (float)(this.holeY.getValue() + 32), 1627324416);
@@ -425,7 +425,7 @@ public class Components extends Module
     
     public void drawOverlay(final float partialTicks, final Entity player, final int x, final int y) {
         float yaw = 0.0f;
-        final int dir = MathHelper.func_76128_c(player.field_70177_z * 4.0f / 360.0f + 0.5) & 0x3;
+        final int dir = MathHelper.floor(player.rotationYaw * 4.0f / 360.0f + 0.5) & 0x3;
         switch (dir) {
             case 1: {
                 yaw = 90.0f;
@@ -442,7 +442,7 @@ public class Components extends Module
         }
         final BlockPos northPos = this.traceToBlock(partialTicks, yaw, player);
         final Block north = this.getBlock(northPos);
-        if (north != null && north != Blocks.field_150350_a) {
+        if (north != null && north != Blocks.AIR) {
             final int damage = this.getBlockDamage(northPos);
             if (damage != 0) {
                 RenderUtil.drawRect((float)(x + 16), (float)y, (float)(x + 32), (float)(y + 16), 1627324416);
@@ -451,7 +451,7 @@ public class Components extends Module
         }
         final BlockPos southPos = this.traceToBlock(partialTicks, yaw - 180.0f, player);
         final Block south = this.getBlock(southPos);
-        if (south != null && south != Blocks.field_150350_a) {
+        if (south != null && south != Blocks.AIR) {
             final int damage2 = this.getBlockDamage(southPos);
             if (damage2 != 0) {
                 RenderUtil.drawRect((float)(x + 16), (float)(y + 32), (float)(x + 32), (float)(y + 48), 1627324416);
@@ -460,7 +460,7 @@ public class Components extends Module
         }
         final BlockPos eastPos = this.traceToBlock(partialTicks, yaw + 90.0f, player);
         final Block east = this.getBlock(eastPos);
-        if (east != null && east != Blocks.field_150350_a) {
+        if (east != null && east != Blocks.AIR) {
             final int damage3 = this.getBlockDamage(eastPos);
             if (damage3 != 0) {
                 RenderUtil.drawRect((float)(x + 32), (float)(y + 16), (float)(x + 48), (float)(y + 32), 1627324416);
@@ -469,7 +469,7 @@ public class Components extends Module
         }
         final BlockPos westPos = this.traceToBlock(partialTicks, yaw - 90.0f, player);
         final Block west = this.getBlock(westPos);
-        if (west != null && west != Blocks.field_150350_a) {
+        if (west != null && west != Blocks.AIR) {
             final int damage4 = this.getBlockDamage(westPos);
             if (damage4 != 0) {
                 RenderUtil.drawRect((float)x, (float)(y + 16), (float)(x + 16), (float)(y + 32), 1627324416);
@@ -479,100 +479,100 @@ public class Components extends Module
     }
     
     private int getBlockDamage(final BlockPos pos) {
-        for (final DestroyBlockProgress destBlockProgress : Components.mc.field_71438_f.field_72738_E.values()) {
-            if (destBlockProgress.func_180246_b().func_177958_n() == pos.func_177958_n() && destBlockProgress.func_180246_b().func_177956_o() == pos.func_177956_o() && destBlockProgress.func_180246_b().func_177952_p() == pos.func_177952_p()) {
-                return destBlockProgress.func_73106_e();
+        for (final DestroyBlockProgress destBlockProgress : Components.mc.renderGlobal.damagedBlocks.values()) {
+            if (destBlockProgress.getPosition().getX() == pos.getX() && destBlockProgress.getPosition().getY() == pos.getY() && destBlockProgress.getPosition().getZ() == pos.getZ()) {
+                return destBlockProgress.getPartialBlockDamage();
             }
         }
         return 0;
     }
     
     private BlockPos traceToBlock(final float partialTicks, final float yaw) {
-        final Vec3d pos = EntityUtil.interpolateEntity((Entity)Components.mc.field_71439_g, partialTicks);
+        final Vec3d pos = EntityUtil.interpolateEntity((Entity)Components.mc.player, partialTicks);
         final Vec3d dir = MathUtil.direction(yaw);
-        return new BlockPos(pos.field_72450_a + dir.field_72450_a, pos.field_72448_b, pos.field_72449_c + dir.field_72449_c);
+        return new BlockPos(pos.x + dir.x, pos.y, pos.z + dir.z);
     }
     
     private BlockPos traceToBlock(final float partialTicks, final float yaw, final Entity player) {
         final Vec3d pos = EntityUtil.interpolateEntity(player, partialTicks);
         final Vec3d dir = MathUtil.direction(yaw);
-        return new BlockPos(pos.field_72450_a + dir.field_72450_a, pos.field_72448_b, pos.field_72449_c + dir.field_72449_c);
+        return new BlockPos(pos.x + dir.x, pos.y, pos.z + dir.z);
     }
     
     private Block getBlock(final BlockPos pos) {
-        final Block block = Components.mc.field_71441_e.func_180495_p(pos).func_177230_c();
-        if (block == Blocks.field_150357_h || block == Blocks.field_150343_Z) {
+        final Block block = Components.mc.world.getBlockState(pos).getBlock();
+        if (block == Blocks.BEDROCK || block == Blocks.OBSIDIAN) {
             return block;
         }
-        return Blocks.field_150350_a;
+        return Blocks.AIR;
     }
     
     private void drawBlock(final Block block, final float x, final float y) {
         final ItemStack stack = new ItemStack(block);
-        GlStateManager.func_179094_E();
-        GlStateManager.func_179147_l();
-        GlStateManager.func_179120_a(770, 771, 1, 0);
-        RenderHelper.func_74520_c();
-        GlStateManager.func_179109_b(x, y, 0.0f);
-        Components.mc.func_175599_af().field_77023_b = 501.0f;
-        Components.mc.func_175599_af().func_180450_b(stack, 0, 0);
-        Components.mc.func_175599_af().field_77023_b = 0.0f;
-        RenderHelper.func_74518_a();
-        GlStateManager.func_179084_k();
-        GlStateManager.func_179131_c(1.0f, 1.0f, 1.0f, 1.0f);
-        GlStateManager.func_179121_F();
+        GlStateManager.pushMatrix();
+        GlStateManager.enableBlend();
+        GlStateManager.tryBlendFuncSeparate(770, 771, 1, 0);
+        RenderHelper.enableGUIStandardItemLighting();
+        GlStateManager.translate(x, y, 0.0f);
+        Components.mc.getRenderItem().zLevel = 501.0f;
+        Components.mc.getRenderItem().renderItemAndEffectIntoGUI(stack, 0, 0);
+        Components.mc.getRenderItem().zLevel = 0.0f;
+        RenderHelper.disableStandardItemLighting();
+        GlStateManager.disableBlend();
+        GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+        GlStateManager.popMatrix();
     }
     
     public void renderInventory() {
         this.boxrender(this.invX.getValue() + this.fineinvX.getValue(), this.invY.getValue() + this.fineinvY.getValue());
-        this.itemrender((NonNullList<ItemStack>)Components.mc.field_71439_g.field_71071_by.field_70462_a, this.invX.getValue() + this.fineinvX.getValue(), this.invY.getValue() + this.fineinvY.getValue());
+        this.itemrender((NonNullList<ItemStack>)Components.mc.player.inventory.mainInventory, this.invX.getValue() + this.fineinvX.getValue(), this.invY.getValue() + this.fineinvY.getValue());
     }
     
     private static void preboxrender() {
         GL11.glPushMatrix();
-        GlStateManager.func_179094_E();
-        GlStateManager.func_179118_c();
-        GlStateManager.func_179086_m(256);
-        GlStateManager.func_179147_l();
-        GlStateManager.func_179131_c(255.0f, 255.0f, 255.0f, 255.0f);
+        GlStateManager.pushMatrix();
+        GlStateManager.disableAlpha();
+        GlStateManager.clear(256);
+        GlStateManager.enableBlend();
+        GlStateManager.color(255.0f, 255.0f, 255.0f, 255.0f);
     }
     
     private static void postboxrender() {
-        GlStateManager.func_179084_k();
-        GlStateManager.func_179097_i();
-        GlStateManager.func_179140_f();
-        GlStateManager.func_179126_j();
-        GlStateManager.func_179141_d();
-        GlStateManager.func_179121_F();
+        GlStateManager.disableBlend();
+        GlStateManager.disableDepth();
+        GlStateManager.disableLighting();
+        GlStateManager.enableDepth();
+        GlStateManager.enableAlpha();
+        GlStateManager.popMatrix();
         GL11.glPopMatrix();
     }
     
     private static void preitemrender() {
         GL11.glPushMatrix();
         GL11.glDepthMask(true);
-        GlStateManager.func_179086_m(256);
-        GlStateManager.func_179097_i();
-        GlStateManager.func_179126_j();
-        RenderHelper.func_74519_b();
-        GlStateManager.func_179152_a(1.0f, 1.0f, 0.01f);
+        GlStateManager.clear(256);
+        GlStateManager.disableDepth();
+        GlStateManager.enableDepth();
+        RenderHelper.enableStandardItemLighting();
+        GlStateManager.scale(1.0f, 1.0f, 0.01f);
     }
     
     private static void postitemrender() {
-        GlStateManager.func_179152_a(1.0f, 1.0f, 1.0f);
-        RenderHelper.func_74518_a();
-        GlStateManager.func_179141_d();
-        GlStateManager.func_179084_k();
-        GlStateManager.func_179140_f();
-        GlStateManager.func_179139_a(0.5, 0.5, 0.5);
-        GlStateManager.func_179097_i();
-        GlStateManager.func_179126_j();
-        GlStateManager.func_179152_a(2.0f, 2.0f, 2.0f);
+        GlStateManager.scale(1.0f, 1.0f, 1.0f);
+        RenderHelper.disableStandardItemLighting();
+        GlStateManager.enableAlpha();
+        GlStateManager.disableBlend();
+        GlStateManager.disableLighting();
+        GlStateManager.scale(0.5, 0.5, 0.5);
+        GlStateManager.disableDepth();
+        GlStateManager.enableDepth();
+        GlStateManager.scale(2.0f, 2.0f, 2.0f);
         GL11.glPopMatrix();
     }
     
     private void boxrender(final int x, final int y) {
         preboxrender();
-        Components.mc.field_71446_o.func_110577_a(Components.box);
+        Components.mc.renderEngine.bindTexture(Components.box);
         RenderUtil.drawTexturedRect(x, y, 0, 0, 176, 16, 500);
         RenderUtil.drawTexturedRect(x, y + 16, 0, 16, 176, 54 + this.invH.getValue(), 500);
         RenderUtil.drawTexturedRect(x, y + 16 + 54, 0, 160, 176, 8, 500);
@@ -585,22 +585,22 @@ public class Components extends Module
             final int iY = y + i / 9 * 18 + 18;
             final ItemStack itemStack = (ItemStack)items.get(i + 9);
             preitemrender();
-            Components.mc.func_175599_af().field_77023_b = 501.0f;
-            RenderUtil.itemRender.func_180450_b(itemStack, iX, iY);
-            RenderUtil.itemRender.func_180453_a(Components.mc.field_71466_p, itemStack, iX, iY, (String)null);
-            Components.mc.func_175599_af().field_77023_b = 0.0f;
+            Components.mc.getRenderItem().zLevel = 501.0f;
+            RenderUtil.itemRender.renderItemAndEffectIntoGUI(itemStack, iX, iY);
+            RenderUtil.itemRender.renderItemOverlayIntoGUI(Components.mc.fontRenderer, itemStack, iX, iY, (String)null);
+            Components.mc.getRenderItem().zLevel = 0.0f;
             postitemrender();
         }
         if (this.renderXCarry.getValue()) {
             for (int i = 1; i < 5; ++i) {
                 final int iX = x + (i + 4) % 9 * 18 + 8;
-                final ItemStack itemStack2 = Components.mc.field_71439_g.field_71069_bz.field_75151_b.get(i).func_75211_c();
-                if (itemStack2 != null && !itemStack2.field_190928_g) {
+                final ItemStack itemStack2 = Components.mc.player.inventoryContainer.inventorySlots.get(i).getStack();
+                if (itemStack2 != null && !itemStack2.isEmpty) {
                     preitemrender();
-                    Components.mc.func_175599_af().field_77023_b = 501.0f;
-                    RenderUtil.itemRender.func_180450_b(itemStack2, iX, y + 1);
-                    RenderUtil.itemRender.func_180453_a(Components.mc.field_71466_p, itemStack2, iX, y + 1, (String)null);
-                    Components.mc.func_175599_af().field_77023_b = 0.0f;
+                    Components.mc.getRenderItem().zLevel = 501.0f;
+                    RenderUtil.itemRender.renderItemAndEffectIntoGUI(itemStack2, iX, y + 1);
+                    RenderUtil.itemRender.renderItemOverlayIntoGUI(Components.mc.fontRenderer, itemStack2, iX, y + 1, (String)null);
+                    Components.mc.getRenderItem().zLevel = 0.0f;
                     postitemrender();
                 }
             }

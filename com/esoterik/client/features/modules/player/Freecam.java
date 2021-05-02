@@ -57,68 +57,68 @@ public class Freecam extends Module
     @Override
     public void onEnable() {
         if (!Feature.fullNullCheck()) {
-            this.oldBoundingBox = Freecam.mc.field_71439_g.func_174813_aQ();
-            Freecam.mc.field_71439_g.func_174826_a(new AxisAlignedBB(Freecam.mc.field_71439_g.field_70165_t, Freecam.mc.field_71439_g.field_70163_u, Freecam.mc.field_71439_g.field_70161_v, Freecam.mc.field_71439_g.field_70165_t, Freecam.mc.field_71439_g.field_70163_u, Freecam.mc.field_71439_g.field_70161_v));
-            if (Freecam.mc.field_71439_g.func_184187_bx() != null) {
-                this.riding = Freecam.mc.field_71439_g.func_184187_bx();
-                Freecam.mc.field_71439_g.func_184210_p();
+            this.oldBoundingBox = Freecam.mc.player.getEntityBoundingBox();
+            Freecam.mc.player.setEntityBoundingBox(new AxisAlignedBB(Freecam.mc.player.posX, Freecam.mc.player.posY, Freecam.mc.player.posZ, Freecam.mc.player.posX, Freecam.mc.player.posY, Freecam.mc.player.posZ));
+            if (Freecam.mc.player.getRidingEntity() != null) {
+                this.riding = Freecam.mc.player.getRidingEntity();
+                Freecam.mc.player.dismountRidingEntity();
             }
-            (this.entity = new EntityOtherPlayerMP((World)Freecam.mc.field_71441_e, Freecam.mc.field_71449_j.func_148256_e())).func_82149_j((Entity)Freecam.mc.field_71439_g);
-            this.entity.field_70177_z = Freecam.mc.field_71439_g.field_70177_z;
-            this.entity.field_70759_as = Freecam.mc.field_71439_g.field_70759_as;
-            this.entity.field_71071_by.func_70455_b(Freecam.mc.field_71439_g.field_71071_by);
-            Freecam.mc.field_71441_e.func_73027_a(69420, (Entity)this.entity);
-            this.position = Freecam.mc.field_71439_g.func_174791_d();
-            this.yaw = Freecam.mc.field_71439_g.field_70177_z;
-            this.pitch = Freecam.mc.field_71439_g.field_70125_A;
-            Freecam.mc.field_71439_g.field_70145_X = true;
+            (this.entity = new EntityOtherPlayerMP((World)Freecam.mc.world, Freecam.mc.session.getProfile())).copyLocationAndAnglesFrom((Entity)Freecam.mc.player);
+            this.entity.rotationYaw = Freecam.mc.player.rotationYaw;
+            this.entity.rotationYawHead = Freecam.mc.player.rotationYawHead;
+            this.entity.inventory.copyInventory(Freecam.mc.player.inventory);
+            Freecam.mc.world.addEntityToWorld(69420, (Entity)this.entity);
+            this.position = Freecam.mc.player.getPositionVector();
+            this.yaw = Freecam.mc.player.rotationYaw;
+            this.pitch = Freecam.mc.player.rotationPitch;
+            Freecam.mc.player.noClip = true;
         }
     }
     
     @Override
     public void onDisable() {
         if (!Feature.fullNullCheck()) {
-            Freecam.mc.field_71439_g.func_174826_a(this.oldBoundingBox);
+            Freecam.mc.player.setEntityBoundingBox(this.oldBoundingBox);
             if (this.riding != null) {
-                Freecam.mc.field_71439_g.func_184205_a(this.riding, true);
+                Freecam.mc.player.startRiding(this.riding, true);
             }
             if (this.entity != null) {
-                Freecam.mc.field_71441_e.func_72900_e((Entity)this.entity);
+                Freecam.mc.world.removeEntity((Entity)this.entity);
             }
             if (this.position != null) {
-                Freecam.mc.field_71439_g.func_70107_b(this.position.field_72450_a, this.position.field_72448_b, this.position.field_72449_c);
+                Freecam.mc.player.setPosition(this.position.x, this.position.y, this.position.z);
             }
-            Freecam.mc.field_71439_g.field_70177_z = this.yaw;
-            Freecam.mc.field_71439_g.field_70125_A = this.pitch;
-            Freecam.mc.field_71439_g.field_70145_X = false;
+            Freecam.mc.player.rotationYaw = this.yaw;
+            Freecam.mc.player.rotationPitch = this.pitch;
+            Freecam.mc.player.noClip = false;
         }
     }
     
     @Override
     public void onUpdate() {
-        Freecam.mc.field_71439_g.field_70145_X = true;
-        Freecam.mc.field_71439_g.func_70016_h(0.0, 0.0, 0.0);
-        Freecam.mc.field_71439_g.field_70747_aH = this.speed.getValue().floatValue();
+        Freecam.mc.player.noClip = true;
+        Freecam.mc.player.setVelocity(0.0, 0.0, 0.0);
+        Freecam.mc.player.jumpMovementFactor = this.speed.getValue().floatValue();
         final double[] dir = MathUtil.directionSpeed(this.speed.getValue());
-        if (Freecam.mc.field_71439_g.field_71158_b.field_78902_a != 0.0f || Freecam.mc.field_71439_g.field_71158_b.field_192832_b != 0.0f) {
-            Freecam.mc.field_71439_g.field_70159_w = dir[0];
-            Freecam.mc.field_71439_g.field_70179_y = dir[1];
+        if (Freecam.mc.player.movementInput.moveStrafe != 0.0f || Freecam.mc.player.movementInput.moveForward != 0.0f) {
+            Freecam.mc.player.motionX = dir[0];
+            Freecam.mc.player.motionZ = dir[1];
         }
         else {
-            Freecam.mc.field_71439_g.field_70159_w = 0.0;
-            Freecam.mc.field_71439_g.field_70179_y = 0.0;
+            Freecam.mc.player.motionX = 0.0;
+            Freecam.mc.player.motionZ = 0.0;
         }
-        Freecam.mc.field_71439_g.func_70031_b(false);
-        if (this.view.getValue() && !Freecam.mc.field_71474_y.field_74311_E.func_151470_d() && !Freecam.mc.field_71474_y.field_74314_A.func_151470_d()) {
-            Freecam.mc.field_71439_g.field_70181_x = this.speed.getValue() * -MathUtil.degToRad(Freecam.mc.field_71439_g.field_70125_A) * Freecam.mc.field_71439_g.field_71158_b.field_192832_b;
+        Freecam.mc.player.setSprinting(false);
+        if (this.view.getValue() && !Freecam.mc.gameSettings.keyBindSneak.isKeyDown() && !Freecam.mc.gameSettings.keyBindJump.isKeyDown()) {
+            Freecam.mc.player.motionY = this.speed.getValue() * -MathUtil.degToRad(Freecam.mc.player.rotationPitch) * Freecam.mc.player.movementInput.moveForward;
         }
-        if (Freecam.mc.field_71474_y.field_74314_A.func_151470_d()) {
-            final EntityPlayerSP field_71439_g = Freecam.mc.field_71439_g;
-            field_71439_g.field_70181_x += this.speed.getValue();
+        if (Freecam.mc.gameSettings.keyBindJump.isKeyDown()) {
+            final EntityPlayerSP player = Freecam.mc.player;
+            player.motionY += this.speed.getValue();
         }
-        if (Freecam.mc.field_71474_y.field_74311_E.func_151470_d()) {
-            final EntityPlayerSP field_71439_g2 = Freecam.mc.field_71439_g;
-            field_71439_g2.field_70181_x -= this.speed.getValue();
+        if (Freecam.mc.gameSettings.keyBindSneak.isKeyDown()) {
+            final EntityPlayerSP player2 = Freecam.mc.player;
+            player2.motionY -= this.speed.getValue();
         }
     }
     

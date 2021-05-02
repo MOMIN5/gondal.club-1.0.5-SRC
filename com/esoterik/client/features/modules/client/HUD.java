@@ -158,7 +158,7 @@ public class HUD extends Module
                 ++j;
             }
         }
-        int i = (HUD.mc.field_71462_r instanceof GuiChat) ? 14 : 0;
+        int i = (HUD.mc.currentScreen instanceof GuiChat) ? 14 : 0;
         if (this.serverBrand.getValue()) {
             final String text2 = "Server brand " + esohack.serverManager.getServerBrand();
             final int[] arrayOfInt = { 1 };
@@ -228,7 +228,7 @@ public class HUD extends Module
                 ++arrayOfInt[0];
             }
         }
-        final String fpsText = "FPS " + Minecraft.field_71470_ab;
+        final String fpsText = "FPS " + Minecraft.debugFPS;
         String text = "Ping " + esohack.serverManager.getPing();
         if (this.fps.getValue()) {
             final int[] arrayOfInt = { 1 };
@@ -252,15 +252,15 @@ public class HUD extends Module
                 ++arrayOfInt[0];
             }
         }
-        final boolean inHell = HUD.mc.field_71441_e.func_180494_b(HUD.mc.field_71439_g.func_180425_c()).func_185359_l().equals("Hell");
-        final int posX = (int)HUD.mc.field_71439_g.field_70165_t;
-        final int posY = (int)HUD.mc.field_71439_g.field_70163_u;
-        final int posZ = (int)HUD.mc.field_71439_g.field_70161_v;
+        final boolean inHell = HUD.mc.world.getBiome(HUD.mc.player.getPosition()).getBiomeName().equals("Hell");
+        final int posX = (int)HUD.mc.player.posX;
+        final int posY = (int)HUD.mc.player.posY;
+        final int posZ = (int)HUD.mc.player.posZ;
         final float nether = inHell ? 8.0f : 0.125f;
-        final int hposX = (int)(HUD.mc.field_71439_g.field_70165_t * nether);
-        final int hposZ = (int)(HUD.mc.field_71439_g.field_70161_v * nether);
+        final int hposX = (int)(HUD.mc.player.posX * nether);
+        final int hposZ = (int)(HUD.mc.player.posZ * nether);
         esohack.notificationManager.handleNotifications(height - (i + 16));
-        i = ((HUD.mc.field_71462_r instanceof GuiChat) ? 14 : 0);
+        i = ((HUD.mc.currentScreen instanceof GuiChat) ? 14 : 0);
         final String coordinates = posX + ", " + posY + ", " + posZ + " [" + hposX + ", " + hposZ + "]";
         text = (this.direction.getValue() ? (esohack.rotationManager.getDirection4D(false) + " ") : "") + (this.coords.getValue() ? coordinates : "") + "";
         final int[] arrayOfInt = { 1 };
@@ -292,15 +292,15 @@ public class HUD extends Module
         String text = "";
         switch (this.greeter.getValue()) {
             case TIME: {
-                text = text + MathUtil.getTimeOfDay() + HUD.mc.field_71439_g.getDisplayNameString();
+                text = text + MathUtil.getTimeOfDay() + HUD.mc.player.getDisplayNameString();
                 break;
             }
             case LONG: {
-                text = text + "looking swag today, " + HUD.mc.field_71439_g.getDisplayNameString() + " :^)";
+                text = text + "looking swag today, " + HUD.mc.player.getDisplayNameString() + " :^)";
                 break;
             }
             default: {
-                text = text + "Welcome " + HUD.mc.field_71439_g.getDisplayNameString();
+                text = text + "Welcome " + HUD.mc.player.getDisplayNameString();
                 break;
             }
         }
@@ -317,59 +317,59 @@ public class HUD extends Module
     public void renderTotemHUD() {
         final int width = this.renderer.scaledWidth;
         final int height = this.renderer.scaledHeight;
-        int totems = HUD.mc.field_71439_g.field_71071_by.field_70462_a.stream().filter(itemStack -> itemStack.func_77973_b() == Items.field_190929_cY).mapToInt(ItemStack::func_190916_E).sum();
-        if (HUD.mc.field_71439_g.func_184592_cb().func_77973_b() == Items.field_190929_cY) {
-            totems += HUD.mc.field_71439_g.func_184592_cb().func_190916_E();
+        int totems = HUD.mc.player.inventory.mainInventory.stream().filter(itemStack -> itemStack.getItem() == Items.TOTEM_OF_UNDYING).mapToInt(ItemStack::func_190916_E).sum();
+        if (HUD.mc.player.getHeldItemOffhand().getItem() == Items.TOTEM_OF_UNDYING) {
+            totems += HUD.mc.player.getHeldItemOffhand().getCount();
         }
         if (totems > 0) {
-            GlStateManager.func_179098_w();
+            GlStateManager.enableTexture2D();
             final int i = width / 2;
             final int iteration = 0;
-            final int y = height - 55 - ((HUD.mc.field_71439_g.func_70090_H() && HUD.mc.field_71442_b.func_78763_f()) ? 10 : 0);
+            final int y = height - 55 - ((HUD.mc.player.isInWater() && HUD.mc.playerController.gameIsSurvivalOrAdventure()) ? 10 : 0);
             final int x = i - 189 + 180 + 2;
-            GlStateManager.func_179126_j();
-            RenderUtil.itemRender.field_77023_b = 200.0f;
-            RenderUtil.itemRender.func_180450_b(HUD.totem, x, y);
-            RenderUtil.itemRender.func_180453_a(HUD.mc.field_71466_p, HUD.totem, x, y, "");
-            RenderUtil.itemRender.field_77023_b = 0.0f;
-            GlStateManager.func_179098_w();
-            GlStateManager.func_179140_f();
-            GlStateManager.func_179097_i();
+            GlStateManager.enableDepth();
+            RenderUtil.itemRender.zLevel = 200.0f;
+            RenderUtil.itemRender.renderItemAndEffectIntoGUI(HUD.totem, x, y);
+            RenderUtil.itemRender.renderItemOverlayIntoGUI(HUD.mc.fontRenderer, HUD.totem, x, y, "");
+            RenderUtil.itemRender.zLevel = 0.0f;
+            GlStateManager.enableTexture2D();
+            GlStateManager.disableLighting();
+            GlStateManager.disableDepth();
             this.renderer.drawStringWithShadow(totems + "", (float)(x + 19 - 2 - this.renderer.getStringWidth(totems + "")), (float)(y + 9), 16777215);
-            GlStateManager.func_179126_j();
-            GlStateManager.func_179140_f();
+            GlStateManager.enableDepth();
+            GlStateManager.disableLighting();
         }
     }
     
     public void renderArmorHUD(final boolean percent) {
         final int width = this.renderer.scaledWidth;
         final int height = this.renderer.scaledHeight;
-        GlStateManager.func_179098_w();
+        GlStateManager.enableTexture2D();
         final int i = width / 2;
         int iteration = 0;
-        final int y = height - 55 - ((HUD.mc.field_71439_g.func_70090_H() && HUD.mc.field_71442_b.func_78763_f()) ? 10 : 0);
-        for (final ItemStack is : HUD.mc.field_71439_g.field_71071_by.field_70460_b) {
+        final int y = height - 55 - ((HUD.mc.player.isInWater() && HUD.mc.playerController.gameIsSurvivalOrAdventure()) ? 10 : 0);
+        for (final ItemStack is : HUD.mc.player.inventory.armorInventory) {
             ++iteration;
-            if (is.func_190926_b()) {
+            if (is.isEmpty()) {
                 continue;
             }
             final int x = i - 90 + (9 - iteration) * 20 + 2;
-            GlStateManager.func_179126_j();
-            RenderUtil.itemRender.field_77023_b = 200.0f;
-            RenderUtil.itemRender.func_180450_b(is, x, y);
-            RenderUtil.itemRender.func_180453_a(HUD.mc.field_71466_p, is, x, y, "");
-            RenderUtil.itemRender.field_77023_b = 0.0f;
-            GlStateManager.func_179098_w();
-            GlStateManager.func_179140_f();
-            GlStateManager.func_179097_i();
-            final String s = (is.func_190916_E() > 1) ? (is.func_190916_E() + "") : "";
+            GlStateManager.enableDepth();
+            RenderUtil.itemRender.zLevel = 200.0f;
+            RenderUtil.itemRender.renderItemAndEffectIntoGUI(is, x, y);
+            RenderUtil.itemRender.renderItemOverlayIntoGUI(HUD.mc.fontRenderer, is, x, y, "");
+            RenderUtil.itemRender.zLevel = 0.0f;
+            GlStateManager.enableTexture2D();
+            GlStateManager.disableLighting();
+            GlStateManager.disableDepth();
+            final String s = (is.getCount() > 1) ? (is.getCount() + "") : "";
             this.renderer.drawStringWithShadow(s, (float)(x + 19 - 2 - this.renderer.getStringWidth(s)), (float)(y + 9), 16777215);
             if (!percent) {
                 continue;
             }
             int dmg = 0;
-            final int itemDurability = is.func_77958_k() - is.func_77952_i();
-            final float green = (is.func_77958_k() - (float)is.func_77952_i()) / is.func_77958_k();
+            final int itemDurability = is.getMaxDamage() - is.getItemDamage();
+            final float green = (is.getMaxDamage() - (float)is.getItemDamage()) / is.getMaxDamage();
             final float red = 1.0f - green;
             if (percent) {
                 dmg = 100 - (int)(red * 100.0f);
@@ -379,8 +379,8 @@ public class HUD extends Module
             }
             this.renderer.drawStringWithShadow(dmg + "", (float)(x + 8 - this.renderer.getStringWidth(dmg + "") / 2), (float)(y - 11), ColorUtil.toRGBA((int)(red * 255.0f), (int)(green * 255.0f), 0));
         }
-        GlStateManager.func_179126_j();
-        GlStateManager.func_179140_f();
+        GlStateManager.enableDepth();
+        GlStateManager.disableLighting();
     }
     
     @SubscribeEvent
@@ -391,7 +391,7 @@ public class HUD extends Module
     static {
         HUD.INSTANCE = new HUD();
         box = new ResourceLocation("textures/gui/container/shulker_box.png");
-        totem = new ItemStack(Items.field_190929_cY);
+        totem = new ItemStack(Items.TOTEM_OF_UNDYING);
     }
     
     public enum Greeter

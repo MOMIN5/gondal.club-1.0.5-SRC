@@ -47,9 +47,9 @@ public class BlockHighlight extends Module
     
     @Override
     public void onRender3D(final Render3DEvent event) {
-        final RayTraceResult ray = BlockHighlight.mc.field_71476_x;
-        if (ray != null && ray.field_72313_a == RayTraceResult.Type.BLOCK) {
-            final BlockPos blockpos = ray.func_178782_a();
+        final RayTraceResult ray = BlockHighlight.mc.objectMouseOver;
+        if (ray != null && ray.typeOfHit == RayTraceResult.Type.BLOCK) {
+            final BlockPos blockpos = ray.getBlockPos();
             RenderUtil.drawBoxESP(blockpos, new Color(this.red.getValue(), this.green.getValue(), this.blue.getValue(), this.alpha.getValue()), this.customOutline.getValue(), new Color(this.cRed.getValue(), this.cGreen.getValue(), this.cBlue.getValue(), this.cAlpha.getValue()), this.lineWidth.getValue(), this.outline.getValue(), this.box.getValue(), this.boxAlpha.getValue(), false);
         }
     }

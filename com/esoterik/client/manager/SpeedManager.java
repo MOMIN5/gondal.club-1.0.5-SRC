@@ -51,19 +51,19 @@ public class SpeedManager extends Feature
     }
     
     public float lastJumpInfoTimeRemaining() {
-        return (Minecraft.func_71386_F() - this.jumpInfoStartTime) / 1000.0f;
+        return (Minecraft.getSystemTime() - this.jumpInfoStartTime) / 1000.0f;
     }
     
     public void updateValues() {
-        final double distTraveledLastTickX = SpeedManager.mc.field_71439_g.field_70165_t - SpeedManager.mc.field_71439_g.field_70169_q;
-        final double distTraveledLastTickZ = SpeedManager.mc.field_71439_g.field_70161_v - SpeedManager.mc.field_71439_g.field_70166_s;
+        final double distTraveledLastTickX = SpeedManager.mc.player.posX - SpeedManager.mc.player.prevPosX;
+        final double distTraveledLastTickZ = SpeedManager.mc.player.posZ - SpeedManager.mc.player.prevPosZ;
         this.speedometerCurrentSpeed = distTraveledLastTickX * distTraveledLastTickX + distTraveledLastTickZ * distTraveledLastTickZ;
-        if (SpeedManager.didJumpThisTick && (!SpeedManager.mc.field_71439_g.field_70122_E || SpeedManager.isJumping)) {
+        if (SpeedManager.didJumpThisTick && (!SpeedManager.mc.player.onGround || SpeedManager.isJumping)) {
             if (SpeedManager.didJumpThisTick && !this.didJumpLastTick) {
                 this.wasFirstJump = (this.lastJumpSpeed == 0.0);
                 this.percentJumpSpeedChanged = ((this.speedometerCurrentSpeed != 0.0) ? (this.speedometerCurrentSpeed / this.lastJumpSpeed - 1.0) : -1.0);
                 this.jumpSpeedChanged = this.speedometerCurrentSpeed - this.lastJumpSpeed;
-                this.jumpInfoStartTime = Minecraft.func_71386_F();
+                this.jumpInfoStartTime = Minecraft.getSystemTime();
                 this.lastJumpSpeed = this.speedometerCurrentSpeed;
                 this.firstJumpSpeed = (this.wasFirstJump ? this.lastJumpSpeed : 0.0);
             }
@@ -79,10 +79,10 @@ public class SpeedManager extends Feature
     }
     
     public void updatePlayers() {
-        for (final EntityPlayer player : SpeedManager.mc.field_71441_e.field_73010_i) {
-            if (SpeedManager.mc.field_71439_g.func_70068_e((Entity)player) < this.distancer * this.distancer) {
-                final double distTraveledLastTickX = player.field_70165_t - player.field_70169_q;
-                final double distTraveledLastTickZ = player.field_70161_v - player.field_70166_s;
+        for (final EntityPlayer player : SpeedManager.mc.world.playerEntities) {
+            if (SpeedManager.mc.player.getDistanceSq((Entity)player) < this.distancer * this.distancer) {
+                final double distTraveledLastTickX = player.posX - player.prevPosX;
+                final double distTraveledLastTickZ = player.posZ - player.prevPosZ;
                 final double playerSpeed = distTraveledLastTickX * distTraveledLastTickX + distTraveledLastTickZ * distTraveledLastTickZ;
                 this.playerSpeeds.put(player, playerSpeed);
             }
@@ -97,7 +97,7 @@ public class SpeedManager extends Feature
     }
     
     public double turnIntoKpH(final double input) {
-        return MathHelper.func_76133_a(input) * 71.2729367892;
+        return MathHelper.sqrt(input) * 71.2729367892;
     }
     
     public double getSpeedKpH() {

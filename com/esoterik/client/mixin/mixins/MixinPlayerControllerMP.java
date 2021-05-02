@@ -41,7 +41,7 @@ public class MixinPlayerControllerMP
 {
     @Redirect(method = { "onPlayerDamageBlock" }, at = @At(value = "INVOKE", target = "Lnet/minecraft/block/state/IBlockState;getPlayerRelativeBlockHardness(Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)F"))
     public float getPlayerRelativeBlockHardnessHook(final IBlockState state, final EntityPlayer player, final World worldIn, final BlockPos pos) {
-        return state.func_185903_a(player, worldIn, pos) * 1.0f;
+        return state.getPlayerRelativeBlockHardness(player, worldIn, pos) * 1.0f;
     }
     
     @Inject(method = { "resetBlockRemoving" }, at = { @At("HEAD") }, cancellable = true)
@@ -69,21 +69,21 @@ public class MixinPlayerControllerMP
     
     @Redirect(method = { "processRightClickBlock" }, at = @At(value = "INVOKE", target = "Lnet/minecraft/item/ItemBlock;canPlaceBlockOnSide(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/util/EnumFacing;Lnet/minecraft/entity/player/EntityPlayer;Lnet/minecraft/item/ItemStack;)Z"))
     public boolean canPlaceBlockOnSideHook(final ItemBlock itemBlock, final World worldIn, BlockPos pos, EnumFacing side, final EntityPlayer player, final ItemStack stack) {
-        final Block block = worldIn.func_180495_p(pos).func_177230_c();
-        if (block == Blocks.field_150431_aC && block.func_176200_f((IBlockAccess)worldIn, pos)) {
+        final Block block = worldIn.getBlockState(pos).getBlock();
+        if (block == Blocks.SNOW_LAYER && block.isReplaceable((IBlockAccess)worldIn, pos)) {
             side = EnumFacing.UP;
         }
-        else if (!block.func_176200_f((IBlockAccess)worldIn, pos)) {
-            pos = pos.func_177972_a(side);
+        else if (!block.isReplaceable((IBlockAccess)worldIn, pos)) {
+            pos = pos.offset(side);
         }
-        final IBlockState iblockstate1 = worldIn.func_180495_p(pos);
-        final AxisAlignedBB axisalignedbb = itemBlock.field_150939_a.func_176223_P().func_185890_d((IBlockAccess)worldIn, pos);
-        return (axisalignedbb == Block.field_185506_k || worldIn.func_72917_a(axisalignedbb.func_186670_a(pos), (Entity)null)) && ((iblockstate1.func_185904_a() == Material.field_151594_q && itemBlock.field_150939_a == Blocks.field_150467_bQ) || (iblockstate1.func_177230_c().func_176200_f((IBlockAccess)worldIn, pos) && itemBlock.field_150939_a.func_176198_a(worldIn, pos, side)));
+        final IBlockState iblockstate1 = worldIn.getBlockState(pos);
+        final AxisAlignedBB axisalignedbb = itemBlock.block.getDefaultState().getCollisionBoundingBox((IBlockAccess)worldIn, pos);
+        return (axisalignedbb == Block.NULL_AABB || worldIn.checkNoEntityCollision(axisalignedbb.offset(pos), (Entity)null)) && ((iblockstate1.getMaterial() == Material.CIRCUITS && itemBlock.block == Blocks.ANVIL) || (iblockstate1.getBlock().isReplaceable((IBlockAccess)worldIn, pos) && itemBlock.block.canPlaceBlockOnSide(worldIn, pos, side)));
     }
     
     @Inject(method = { "processRightClickBlock" }, at = { @At("HEAD") }, cancellable = true)
     public void processRightClickBlock(final EntityPlayerSP player, final WorldClient worldIn, final BlockPos pos, final EnumFacing direction, final Vec3d vec, final EnumHand hand, final CallbackInfoReturnable<EnumActionResult> cir) {
-        final ProcessRightClickBlockEvent event = new ProcessRightClickBlockEvent(pos, hand, Minecraft.func_71410_x().field_71439_g.func_184586_b(hand));
+        final ProcessRightClickBlockEvent event = new ProcessRightClickBlockEvent(pos, hand, Minecraft.getMinecraft().player.getHeldItem(hand));
         MinecraftForge.EVENT_BUS.post((Event)event);
         if (event.isCanceled()) {
             cir.cancel();

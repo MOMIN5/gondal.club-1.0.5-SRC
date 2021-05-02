@@ -42,7 +42,7 @@ public class StringButton extends Button
     public void mouseClicked(final int mouseX, final int mouseY, final int mouseButton) {
         super.mouseClicked(mouseX, mouseY, mouseButton);
         if (this.isHovering(mouseX, mouseY)) {
-            StringButton.mc.func_147118_V().func_147682_a((ISound)PositionedSoundRecord.func_184371_a(SoundEvents.field_187909_gi, 1.0f));
+            StringButton.mc.getSoundHandler().playSound((ISound)PositionedSoundRecord.getMasterRecord(SoundEvents.UI_BUTTON_CLICK, 1.0f));
         }
     }
     
@@ -62,7 +62,7 @@ public class StringButton extends Button
                     break;
                 }
                 default: {
-                    if (ChatAllowedCharacters.func_71566_a(typedChar)) {
+                    if (ChatAllowedCharacters.isAllowedCharacter(typedChar)) {
                         this.setString(this.currentString.getString() + typedChar);
                         break;
                     }

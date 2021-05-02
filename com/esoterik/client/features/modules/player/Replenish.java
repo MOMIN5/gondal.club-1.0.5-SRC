@@ -48,7 +48,7 @@ public class Replenish extends Module
     
     @Override
     public void onUpdate() {
-        if (Replenish.mc.field_71462_r instanceof GuiContainer && (!(Replenish.mc.field_71462_r instanceof GuiInventory) || this.pauseInv.getValue())) {
+        if (Replenish.mc.currentScreen instanceof GuiContainer && (!(Replenish.mc.currentScreen instanceof GuiInventory) || this.pauseInv.getValue())) {
             return;
         }
         if (this.timer.passedMs(this.updates.getValue())) {
@@ -78,7 +78,7 @@ public class Replenish extends Module
     private void mapHotbar() {
         final Map<Integer, ItemStack> map = new ConcurrentHashMap<Integer, ItemStack>();
         for (int i = 0; i < 9; ++i) {
-            final ItemStack stack = Replenish.mc.field_71439_g.field_71071_by.func_70301_a(i);
+            final ItemStack stack = Replenish.mc.player.inventory.getStackInSlot(i);
             map.put(i, stack);
         }
         if (this.hotbar.isEmpty()) {
@@ -89,12 +89,12 @@ public class Replenish extends Module
         for (final Map.Entry<Integer, ItemStack> hotbarItem : map.entrySet()) {
             final ItemStack stack2 = hotbarItem.getValue();
             final Integer slotKey = hotbarItem.getKey();
-            if (slotKey != null && stack2 != null && (stack2.field_190928_g || stack2.func_77973_b() == Items.field_190931_a || (stack2.field_77994_a <= this.threshold.getValue() && stack2.field_77994_a < stack2.func_77976_d()))) {
+            if (slotKey != null && stack2 != null && (stack2.isEmpty || stack2.getItem() == Items.AIR || (stack2.stackSize <= this.threshold.getValue() && stack2.stackSize < stack2.getMaxStackSize()))) {
                 ItemStack previousStack = hotbarItem.getValue();
-                if (stack2.field_190928_g || stack2.func_77973_b() != Items.field_190931_a) {
+                if (stack2.isEmpty || stack2.getItem() != Items.AIR) {
                     previousStack = this.hotbar.get(slotKey);
                 }
-                if (previousStack == null || previousStack.field_190928_g || previousStack.func_77973_b() == Items.field_190931_a) {
+                if (previousStack == null || previousStack.isEmpty || previousStack.getItem() == Items.AIR) {
                     continue;
                 }
                 final int replenishSlot = this.getReplenishSlot(previousStack);
